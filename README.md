@@ -15,14 +15,14 @@ While our focus will always remain on Demigods RPG, we will work with anyone wil
 What Stoa Is
 ====
 
-Stoa is effectivly the engine behind Demigods.  Most every concept (characters, structures, deities (character-classes), abilities, skills, and more) has its utility functions, data, persistence, and low-level logic handled in Stoa. Things like indivigul deities, abilities, skills, or structures are implementations upon the concepts handled in Stoa.
+Stoa is effectivly the engine behind Demigods.  Most every concept (characters, structures, deities (character-classes), abilities, skills, and more) has its utility functions, data, persistence, and low-level logic handled in Stoa. Things like individual deities, abilities, skills, or structures are implementations upon the concepts handled in Stoa.
 
 This makes Demigods a sort of "plugin" for Stoa.
 
 What Stoa Isn't
 ====
 
-Stoa isn't a plugin. Stoa won't work on it's own. Stoa ins't something an Administrator can just install on their Bukkit server and expect to do something.
+Stoa isn't a plugin. Stoa won't work on it's own. Stoa isn't something an Administrator can just install on their Bukkit server and expect to do something.
 
 Stoa has no implementation built in, the details are left up to the developers. We recommend that developers shade Stoa into their plugins (with the maven-shade-plugin), relocating them (to prevent version mismatch problems), and basically allowing it to do the work in the shadows.
 
