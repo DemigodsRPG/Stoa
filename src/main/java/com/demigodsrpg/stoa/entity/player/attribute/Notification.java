@@ -35,7 +35,7 @@ public class Notification extends DataAccess<UUID, Notification>
 		note.id = id;
 		note.expiration = conf.getLong("expiration");
 		note.receiver = UUID.fromString(conf.getString("receiver"));
-		note.sender = UUID.fromString(conf.getString("sender"));
+		if(conf.getString("sender") != null) note.sender = UUID.fromString(conf.getString("sender"));
 		note.senderType = conf.getString("senderType");
 		note.alert = conf.getString("alert");
 		note.name = conf.getString("name");
@@ -49,7 +49,7 @@ public class Notification extends DataAccess<UUID, Notification>
 		Map<String, Object> map = new HashMap<>();
 		map.put("expiration", expiration);
 		map.put("receiver", receiver.toString());
-		map.put("sender", sender.toString());
+		if(sender != null) map.put("sender", sender.toString());
 		map.put("senderType", senderType);
 		map.put("alert", alert);
 		map.put("name", name);

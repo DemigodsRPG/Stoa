@@ -133,7 +133,7 @@ public class StoaCharacter extends DataAccess<UUID, StoaCharacter> implements Pa
 		try
 		{
 			map.put("name", name);
-			map.put("mojangAccount", mojangAccount);
+			map.put("mojangAccount", mojangAccount.toString());
 			map.put("alive", alive);
 			map.put("health", health);
 			map.put("hunger", hunger);
