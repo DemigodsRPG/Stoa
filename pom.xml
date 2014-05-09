@@ -117,10 +117,6 @@
                                     <pattern>org.atteo</pattern>
                                     <shadedPattern>demigods.shaded.org.atteo</shadedPattern>
                                 </relocation>
-                                <relocation>
-                                    <pattern>com.censoredsoftware.library</pattern>
-                                    <shadedPattern>demigods.shaded.com.censoredsoftware.library</shadedPattern>
-                                </relocation>
                             </relocations>
                         </configuration>
                     </execution>

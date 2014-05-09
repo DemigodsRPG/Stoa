@@ -63,7 +63,7 @@ public abstract class StoaPlugin extends AbstractJavaPlugin
 		return ready;
 	}
 
-	abstract void message(String status);
+	protected abstract void message(String status);
 
 	public abstract Mythos getBaseGame();
 
