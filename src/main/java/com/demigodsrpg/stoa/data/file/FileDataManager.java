@@ -50,6 +50,9 @@ public class FileDataManager extends DataManager
 		yamlFiles = Maps.newConcurrentMap();
 		for(DataType type : DataType.values())
 		{
+			// Skip invalid.
+			if(DataType.INVALID.equals(type)) continue;
+
 			DataProvidedYamlFile file = new DataProvidedYamlFile(type, SAVE_PATH, type.getAbbreviation(), ".stoa");
 			file.loadDataFromFile();
 			yamlFiles.put(type.getDataClass(), file);
