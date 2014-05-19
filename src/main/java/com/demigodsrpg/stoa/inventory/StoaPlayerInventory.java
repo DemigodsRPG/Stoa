@@ -177,7 +177,14 @@ public class StoaPlayerInventory extends DataAccess<UUID, StoaPlayerInventory>
 
 	public static StoaPlayerInventory get(UUID id)
 	{
-		return DATA_ACCESS.getDirect(id);
+		try
+		{
+			return DATA_ACCESS.getDirect(id);
+		}
+		catch(NullPointerException ignored)
+		{
+		}
+		return createEmpty();
 	}
 
 	public static StoaPlayerInventory create(StoaCharacter character)

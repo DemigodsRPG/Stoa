@@ -103,7 +103,14 @@ public class StoaEnderInventory extends DataAccess<UUID, StoaEnderInventory>
 
 	public static StoaEnderInventory get(UUID id)
 	{
-		return DATA_ACCESS.getDirect(id);
+		try
+		{
+			return DATA_ACCESS.getDirect(id);
+		}
+		catch(NullPointerException ignored)
+		{
+		}
+		return createEmpty();
 	}
 
 	public static StoaEnderInventory create(StoaCharacter character)
