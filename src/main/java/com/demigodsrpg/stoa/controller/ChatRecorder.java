@@ -1,4 +1,4 @@
-package com.demigodsrpg.stoa.util;
+package com.demigodsrpg.stoa.controller;
 
 import com.censoredsoftware.library.util.Times;
 import com.demigodsrpg.stoa.StoaPlugin;

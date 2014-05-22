@@ -14,8 +14,8 @@
 
     <licenses>
         <license>
-            <name>Artistic License 2.0</name>
-            <url>LICENSE.txt</url>
+            <name>Apache License Version 2.0</name>
+            <url>LICENSE</url>
             <distribution>repo</distribution>
             <comments>License on all contributions</comments>
         </license>
@@ -43,6 +43,16 @@
     </repositories>
 
     <dependencies>
+        <!-- Spigot API -->
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>1.7.9-R0.1-SNAPSHOT</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- CensoredLib -->
         <dependency>
             <groupId>com.censoredsoftware.library</groupId>
             <artifactId>command</artifactId>
@@ -78,6 +88,14 @@
             <artifactId>util</artifactId>
             <version>${censoredlib.version}</version>
         </dependency>
+
+        <!-- javatuples -->
+        <dependency>
+            <groupId>org.javatuples</groupId>
+            <artifactId>javatuples</artifactId>
+            <version>1.2</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -108,14 +126,14 @@
                         <configuration>
                             <artifactSet>
                                 <includes>
-                                    <include>org.atteo:evo-inflector</include>
                                     <include>com.censoredsoftware.library:*</include>
+                                    <include>org.javatuples:javatuples</include>
                                 </includes>
                             </artifactSet>
                             <relocations>
                                 <relocation>
-                                    <pattern>org.atteo</pattern>
-                                    <shadedPattern>demigods.shaded.org.atteo</shadedPattern>
+                                    <pattern>org.javatuples</pattern>
+                                    <shadedPattern>com.censoredsoftware.stoa.org.javatuples</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>
