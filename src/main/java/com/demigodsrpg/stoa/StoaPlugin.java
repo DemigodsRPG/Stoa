@@ -1,6 +1,10 @@
 package com.demigodsrpg.stoa;
 
 import com.censoredsoftware.library.command.AbstractJavaPlugin;
+import com.censoredsoftware.shaded.com.iciql.Db;
+import com.demigodsrpg.stoa.model.CharacterModel;
+import com.demigodsrpg.stoa.model.NotificationModel;
+import com.demigodsrpg.stoa.model.PlayerModel;
 import com.demigodsrpg.stoa.mythos.Mythos;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -42,6 +46,23 @@ public abstract class StoaPlugin extends AbstractJavaPlugin
 			return;
 		}
 		else ready = true;
+
+		try
+		{
+			Class.forName("org.postgresql.Driver");
+		}
+		catch(ClassNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+
+		Db db = Db.open("jdbc:postgresql://localhost:5432/minecraft", "minecraft", "minecraft");
+
+		db.from(new PlayerModel()).select();
+		db.from(new CharacterModel()).select();
+		db.from(new NotificationModel()).select();
+
+		db.close();
 
 		// Print success!
 		message(" enabled");

@@ -1,4 +1,4 @@
-package com.demigodsrpg.stoa.controller;
+package com.demigodsrpg.stoa.listener;
 
 import com.demigodsrpg.stoa.entity.player.StoaPlayer;
 import com.demigodsrpg.stoa.event.StoaChatEvent;

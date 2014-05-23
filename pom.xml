@@ -96,6 +96,13 @@
             <version>1.2</version>
             <scope>compile</scope>
         </dependency>
+
+        <!-- postgre -->
+        <dependency>
+            <groupId>postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>9.1-901-1.jdbc4</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -128,6 +135,7 @@
                                 <includes>
                                     <include>com.censoredsoftware.library:*</include>
                                     <include>org.javatuples:javatuples</include>
+                                    <include>postgresql:postgresql</include>
                                 </includes>
                             </artifactSet>
                             <relocations>

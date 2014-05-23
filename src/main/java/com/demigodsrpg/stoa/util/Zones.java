@@ -2,8 +2,8 @@ package com.demigodsrpg.stoa.util;
 
 import com.censoredsoftware.library.util.WorldGuards;
 import com.demigodsrpg.stoa.StoaPlugin;
-import com.demigodsrpg.stoa.controller.ZoneListener;
 import com.demigodsrpg.stoa.entity.player.StoaCharacter;
+import com.demigodsrpg.stoa.listener.ZoneListener;
 import com.demigodsrpg.stoa.structure.StoaStructure;
 import com.demigodsrpg.stoa.structure.StoaStructureType;
 import com.google.common.base.Predicate;

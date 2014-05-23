@@ -8,7 +8,7 @@ import org.bukkit.GameMode;
 import java.util.UUID;
 
 @Iciql.IQTable(name = "characters")
-public class CharacterModel
+public class CharacterModel implements Model
 {
 	// -- DEFAULT CONSTRUCTOR -- //
 	public CharacterModel()
@@ -91,17 +91,27 @@ public class CharacterModel
 	// private Map<String, UUID> invites;
 
 	// -- FOREIGN DATA -- //
-	// public Set<String> minorDeities;
 	@Iciql.IQColumn(nullable = false)
 	public String playerId;
 	@Iciql.IQColumn
 	public String inventoryId;
 	@Iciql.IQColumn
 	public String enderInventory;
-	// public Set<PotionEffectModel> potionEffects;
-	// public Set<DeathModel> deaths;
 	@Iciql.IQColumn
 	public String locationId;
 	@Iciql.IQColumn
 	public String bedSpawnId;
+
+	// -- INTERFACE METHODS -- //
+	@Override
+	public String id()
+	{
+		return uuid;
+	}
+
+	@Override
+	public String name()
+	{
+		return "CHARACTER";
+	}
 }

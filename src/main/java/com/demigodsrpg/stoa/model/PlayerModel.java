@@ -2,7 +2,7 @@ package com.demigodsrpg.stoa.model;
 
 import com.censoredsoftware.library.mcidprovider.McIdProvider;
 import com.censoredsoftware.shaded.com.iciql.Iciql;
-import com.demigodsrpg.stoa.controller.ChatRecorder;
+import com.demigodsrpg.stoa.util.ChatRecorder;
 import com.demigodsrpg.stoa.util.Configs;
 import org.bukkit.entity.Player;
 
@@ -10,7 +10,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 
 @Iciql.IQTable(name = "players")
-public class PlayerModel
+public class PlayerModel implements Model
 {
 	// -- DEFAULT CONSTRUCTOR -- //
 	public PlayerModel()
@@ -67,4 +67,17 @@ public class PlayerModel
 
 	// -- TRANSIENT -- //
 	public transient ChatRecorder chatRecorder;
+
+	// -- INTERFACE METHODS -- //
+	@Override
+	public String id()
+	{
+		return mojangAccount;
+	}
+
+	@Override
+	public String name()
+	{
+		return "PLAYER";
+	}
 }

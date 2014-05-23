@@ -8,7 +8,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Iciql.IQTable(name = "notifications")
-public class NotificationModel
+public class NotificationModel implements Model
 {
 	// -- DEFAULT CONSTRUCTOR -- //
 	public NotificationModel()
@@ -68,4 +68,17 @@ public class NotificationModel
 	public String senderId;
 	@Iciql.IQColumn
 	public String receiverId;
+
+	// -- INTERFACE METHODS -- //
+	@Override
+	public String id()
+	{
+		return id;
+	}
+
+	@Override
+	public String name()
+	{
+		return "NOTIFICATION";
+	}
 }

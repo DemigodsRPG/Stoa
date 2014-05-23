@@ -1,7 +1,6 @@
-package com.demigodsrpg.stoa.controller;
+package com.demigodsrpg.stoa.tribute;
 
 import com.censoredsoftware.library.util.Randoms;
-import com.demigodsrpg.stoa.tribute.TributeData;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
