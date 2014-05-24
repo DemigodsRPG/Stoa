@@ -37,7 +37,7 @@ public abstract class Controller<T extends Model>
 
 	public Controller<T> open()
 	{
-		DB = Db.open("jdbc:" + Configs.getSettingString("db.type") + "://" + Configs.getSettingString("db.host") + ":" + Configs.getSettingString("db.port") + "/" + Configs.getSettingString("db.name"), Configs.getSettingString("db.user"), Configs.getSettingString("db.pass"));
+		DB = openDb();
 		return this;
 	}
 
@@ -77,4 +77,9 @@ public abstract class Controller<T extends Model>
 
 	protected T model;
 	protected Db DB;
+
+	protected static Db openDb()
+	{
+		return Db.open("jdbc:" + Configs.getSettingString("db.type") + "://" + Configs.getSettingString("db.host") + ":" + Configs.getSettingString("db.port") + "/" + Configs.getSettingString("db.name"), Configs.getSettingString("db.user"), Configs.getSettingString("db.pass"));
+	}
 }

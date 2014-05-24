@@ -1,6 +1,7 @@
 package com.demigodsrpg.stoa.controller;
 
 import com.censoredsoftware.library.data.ServerData;
+import com.censoredsoftware.library.mcidprovider.McIdProvider;
 import com.demigodsrpg.stoa.StoaPlugin;
 import com.demigodsrpg.stoa.battle.Battle;
 import com.demigodsrpg.stoa.battle.Participant;
@@ -11,7 +12,6 @@ import com.demigodsrpg.stoa.entity.player.attribute.Notification;
 import com.demigodsrpg.stoa.inventory.StoaEnderInventory;
 import com.demigodsrpg.stoa.inventory.StoaPlayerInventory;
 import com.demigodsrpg.stoa.language.English;
-import com.demigodsrpg.stoa.model.CharacterModel;
 import com.demigodsrpg.stoa.model.PlayerModel;
 import com.demigodsrpg.stoa.util.ChatRecorder;
 import com.demigodsrpg.stoa.util.Configs;
@@ -25,7 +25,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.PlayerInventory;
@@ -40,6 +39,16 @@ import java.util.concurrent.TimeUnit;
 
 public class PlayerController extends Controller<PlayerModel> implements Participant<PlayerModel>
 {
+	public static PlayerController fromName(String playerName)
+	{
+		return new PlayerController().control(McIdProvider.getId(playerName).toString());
+	}
+
+	public static PlayerController fromId(String mojangId)
+	{
+		return new PlayerController().control(mojangId);
+	}
+
 	public PlayerController setPlayerName(String playerName)
 	{
 		model.playerName = playerName;
@@ -62,9 +71,9 @@ public class PlayerController extends Controller<PlayerModel> implements Partici
 	{
 		model.currentCharacterId = null;
 
-		if(getEntity() instanceof Player)
+		if(getEntity() != null)
 		{
-			Player player = (Player) getEntity();
+			Player player = getEntity();
 			player.setDisplayName(player.getName());
 			player.setPlayerListName(player.getName());
 			player.setMaxHealth(20.0);
@@ -81,10 +90,10 @@ public class PlayerController extends Controller<PlayerModel> implements Partici
 
 	public PlayerController updateCanPvp()
 	{
-		if(!(getEntity() instanceof Player)) return this;
+		if(getEntity() == null) return this;
 
 		// Define variables
-		final Player player = (Player) getEntity();
+		final Player player = getEntity();
 		final boolean inNoPvpZone = Zones.inNoPvpZone(player.getLocation());
 
 		if(getCharacter() != null && Battle.isInBattle(getCharacter())) return this;
@@ -153,7 +162,7 @@ public class PlayerController extends Controller<PlayerModel> implements Partici
 
 	public PlayerController setToMortal()
 	{
-		Player player = (Player) getEntity();
+		Player player = getEntity();
 		saveCurrentCharacter();
 		player.setMaxHealth(20.0);
 		player.setHealth(20.0);
@@ -196,17 +205,18 @@ public class PlayerController extends Controller<PlayerModel> implements Partici
 		return this;
 	}
 
-	public void saveCurrentCharacter()
+	public PlayerController saveCurrentCharacter()
 	{
 		// Update the current character
-		final Player player = getBukkitOfflinePlayer().getPlayer();
-		final StoaCharacter character = getCharacter();
+		final Player player = getEntity();
+		final CharacterController character = getCharacter();
 
 		if(character != null)
 		{
+			character.open();
+
 			// Set to inactive and update previous
 			character.setActive(false);
-			this.previous = character.getId();
 
 			// Set the values
 			character.setHealth(player.getHealth() >= character.getMaxHealth() ? character.getMaxHealth() : player.getHealth());
@@ -229,27 +239,29 @@ public class PlayerController extends Controller<PlayerModel> implements Partici
 			// Disown pets
 			StoaTameable.disownPets(character.getName());
 
-			// Save it
-			character.save();
+			character.update();
+
+			character.relinquish();
 		}
+
+		return this;
 	}
 
-	public void switchCharacter(final StoaCharacter newChar)
+	public PlayerController switchCharacter(final CharacterController newChar)
 	{
-		final Player player = getBukkitOfflinePlayer().getPlayer();
+		final Player player = getEntity();
 
-		if(!newChar.getPlayerName().equals(this.playerName))
+		if(!newChar.getPlayerName().equals(model.playerName))
 		{
 			player.sendMessage(ChatColor.RED + "You can't do that.");
-			return;
+			return this;
 		}
 
 		// Save the current character
 		saveCurrentCharacter();
 
 		// Set new character to active and other info
-		this.current = newChar.getId();
-		currentDeityName = newChar.getDeity().getName();
+		model.currentCharacterId = newChar.getModel().id();
 
 		// Apply the new character
 		newChar.applyToPlayer(player);
@@ -265,8 +277,10 @@ public class PlayerController extends Controller<PlayerModel> implements Partici
 		}
 
 		// Save instances
-		save();
-		newChar.save();
+		open().update().close();
+		newChar.open().update().relinquish();
+
+		return this;
 	}
 
 	public Set<StoaCharacter> getCharacters()
@@ -434,9 +448,9 @@ public class PlayerController extends Controller<PlayerModel> implements Partici
 	}
 
 	@Override
-	public Controller<PlayerModel> control(String modelId)
+	public PlayerController control(String modelId)
 	{
-		return control(modelId, new PlayerModel());
+		return (PlayerController) control(modelId, new PlayerModel());
 	}
 
 	@Override
@@ -447,10 +461,16 @@ public class PlayerController extends Controller<PlayerModel> implements Partici
 	}
 
 	@Override
-	public CharacterModel getCharacter()
+	public CharacterController getCharacter()
 	{
-		if(model.currentCharacterId == null) return null;
-		return new CharacterController().control(model.currentCharacterId).getModel();
+		if(!hasCharacter()) return null;
+		return new CharacterController().control(model.currentCharacterId);
+	}
+
+	@Override
+	public Boolean hasCharacter()
+	{
+		return model.currentCharacterId != null;
 	}
 
 	@Override
@@ -467,7 +487,7 @@ public class PlayerController extends Controller<PlayerModel> implements Partici
 	}
 
 	@Override
-	public LivingEntity getEntity()
+	public Player getEntity()
 	{
 		return Bukkit.getPlayer(model.mojangAccount);
 	}

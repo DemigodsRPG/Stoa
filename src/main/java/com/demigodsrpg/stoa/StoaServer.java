@@ -1,5 +1,6 @@
 package com.demigodsrpg.stoa;
 
+import com.censoredsoftware.shaded.com.iciql.Db;
 import com.demigodsrpg.stoa.data.DataManager;
 import com.demigodsrpg.stoa.data.StoaWorld;
 import com.demigodsrpg.stoa.data.TaskManager;
@@ -11,6 +12,9 @@ import com.demigodsrpg.stoa.entity.player.StoaCharacter;
 import com.demigodsrpg.stoa.entity.player.StoaPlayer;
 import com.demigodsrpg.stoa.entity.player.attribute.Skill;
 import com.demigodsrpg.stoa.item.DivineItem;
+import com.demigodsrpg.stoa.model.CharacterModel;
+import com.demigodsrpg.stoa.model.NotificationModel;
+import com.demigodsrpg.stoa.model.PlayerModel;
 import com.demigodsrpg.stoa.mythos.Mythos;
 import com.demigodsrpg.stoa.mythos.MythosSet;
 import com.demigodsrpg.stoa.structure.StoaStructureType;
@@ -55,6 +59,31 @@ public class StoaServer
 	// Load everything else.
 	protected boolean init()
 	{
+		try
+		{
+			Class.forName("org.postgresql.Driver");
+		}
+		catch(ClassNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+
+		try
+		{
+			Db db = Db.open("jdbc:postgresql://localhost:5432/minecraft", "minecraft", "minecraft");
+
+			db.from(new PlayerModel()).select();
+			db.from(new CharacterModel()).select();
+			db.from(new NotificationModel()).select();
+
+			db.close();
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+			return false;
+		}
+
 		// Initialize metrics
 		try
 		{
