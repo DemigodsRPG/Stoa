@@ -7,9 +7,9 @@ import org.bukkit.entity.LivingEntity;
 
 public interface Participant<T extends Model>
 {
-	Boolean hasCharacter();
+	boolean hasCharacter();
 
-	Boolean canPvp();
+	boolean canPvp();
 
 	Location getCurrentLocation();
 

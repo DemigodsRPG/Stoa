@@ -14,7 +14,7 @@ import java.util.Collection;
 public class Stoa
 {
 	// -- CONSTANTS -- //
-	private static final StoaServer DEMIGODS_SERVER = new StoaServer();
+	private static final StoaServer STOA_SERVER = new StoaServer();
 	private static final ConversationFactory CONVERSATION_FACTORY = new ConversationFactory(StoaPlugin.getInst());
 
 	// -- CONSTRUCTOR -- //
@@ -27,7 +27,7 @@ public class Stoa
 
 	public static StoaServer getServer()
 	{
-		return DEMIGODS_SERVER;
+		return STOA_SERVER;
 	}
 
 	public static ConversationFactory getConversationFactory()
@@ -40,7 +40,7 @@ public class Stoa
 		return getServer().getMythos();
 	}
 
-	// -- PASS UP DATA FROM DEMIGODS SERVER CLASS -- //
+	// -- PASS UP DATA FROM STOA SERVER CLASS -- //
 
 	public static Collection<StoaPlayer> getOnlinePlayers()
 	{

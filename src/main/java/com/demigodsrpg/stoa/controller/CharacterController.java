@@ -6,7 +6,6 @@ import com.censoredsoftware.shaded.com.iciql.Db;
 import com.demigodsrpg.stoa.Stoa;
 import com.demigodsrpg.stoa.StoaPlugin;
 import com.demigodsrpg.stoa.battle.Participant;
-import com.demigodsrpg.stoa.data.DataAccess;
 import com.demigodsrpg.stoa.data.DataManager;
 import com.demigodsrpg.stoa.deity.Ability;
 import com.demigodsrpg.stoa.deity.Alliance;
@@ -14,31 +13,31 @@ import com.demigodsrpg.stoa.deity.Deity;
 import com.demigodsrpg.stoa.entity.StoaTameable;
 import com.demigodsrpg.stoa.entity.player.StoaPlayer;
 import com.demigodsrpg.stoa.entity.player.attribute.Skill;
-import com.demigodsrpg.stoa.entity.player.attribute.StoaCharacterMeta;
 import com.demigodsrpg.stoa.entity.player.attribute.StoaPotionEffect;
 import com.demigodsrpg.stoa.event.StoaChatEvent;
 import com.demigodsrpg.stoa.inventory.StoaEnderInventory;
 import com.demigodsrpg.stoa.inventory.StoaPlayerInventory;
-import com.demigodsrpg.stoa.language.English;
 import com.demigodsrpg.stoa.location.StoaLocation;
 import com.demigodsrpg.stoa.model.CharacterModel;
+import com.demigodsrpg.stoa.model.PlayerModel;
 import com.demigodsrpg.stoa.structure.StoaStructure;
 import com.demigodsrpg.stoa.structure.StoaStructureType;
 import com.demigodsrpg.stoa.util.Configs;
 import com.demigodsrpg.stoa.util.Messages;
-import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import org.bukkit.*;
-import org.bukkit.entity.LivingEntity;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class CharacterController extends Controller<CharacterModel> implements Participant<CharacterModel>
@@ -58,293 +57,128 @@ public class CharacterController extends Controller<CharacterModel> implements P
 		return new CharacterController().control(characterId);
 	}
 
-	void setName(String name)
+	public static CharacterController fromPlayer(Player player)
 	{
-		this.name = name;
+		return PlayerController.fromName(player.getName()).getCharacter();
 	}
 
-	void setDeity(Deity deity)
+	public CharacterController setName(String name)
 	{
-		this.deity = deity.getName();
+		model.name = name;
 	}
 
-	public void setMinorDeities(Set<String> set)
+	public CharacterController setDeity(Deity deity)
+	{
+		model.deity = deity.getName();
+	}
+
+	public CharacterController setMinorDeities(Set<String> set)
 	{
 		this.minorDeities = set;
 	}
 
-	public void addMinorDeity(Deity deity)
+	public CharacterController addMinorDeity(Deity deity)
 	{
 		this.minorDeities.add(deity.getName());
 	}
 
-	public void removeMinorDeity(Deity deity)
+	public CharacterController removeMinorDeity(Deity deity)
 	{
 		this.minorDeities.remove(deity.getName());
 	}
 
-	void setMojangAccount(StoaPlayer player)
+	public CharacterController setPlayer(PlayerModel player)
 	{
-		this.mojangAccount = player.getMojangAccount();
+		model.playerId = player.id();
 	}
 
-	public void setActive(boolean option)
+	public CharacterController setActive(boolean option)
 	{
-		this.active = option;
-		save();
+		model.active = option;
+		return this;
 	}
 
-	public void saveInventory()
+	public CharacterController saveInventory()
 	{
-		this.inventory = StoaPlayerInventory.create(this).getId();
-		this.enderInventory = StoaEnderInventory.create(this).getId();
-		save();
+		model.inventoryId = StoaPlayerInventory.create(this).getId();
+		model.enderInventory = StoaEnderInventory.create(this).getId();
+		return this;
 	}
 
-	public void setAlive(boolean alive)
+	public CharacterController setAlive(boolean alive)
 	{
-		this.alive = alive;
-		save();
+		model.alive = alive;
+		return this;
 	}
 
-	public void setHealth(double health)
+	public CharacterController setHealth(double health)
 	{
-		this.health = health;
+		model.health = health;
 	}
 
-	public void setHunger(int hunger)
+	public CharacterController setHunger(int hunger)
 	{
-		this.hunger = hunger;
+		model.hunger = hunger;
 	}
 
-	public void setLevel(int level)
+	public CharacterController setLevel(int level)
 	{
-		this.level = level;
+		model.level = level;
 	}
 
-	public void setExperience(float exp)
+	public CharacterController setExperience(float exp)
 	{
-		this.experience = exp;
+		model.experience = exp;
 	}
 
-	public void setLocation(Location location)
+	public CharacterController setLocation(Location location)
 	{
-		this.location = StoaLocation.of(location).getId();
+		model.locationId = StoaLocation.of(location).getId();
 	}
 
-	public void setBedSpawn(Location location)
+	public CharacterController setBedSpawn(Location location)
 	{
-		this.bedSpawn = StoaLocation.of(location).getId();
+		model.bedSpawnId = StoaLocation.of(location).getId();
 	}
 
-	public void setGameMode(GameMode gameMode)
+	public CharacterController setGameMode(GameMode gameMode)
 	{
-		this.gameMode = gameMode;
+		model.gameMode = gameMode;
 	}
 
-	public void setMeta(StoaCharacterMeta meta)
+	public CharacterController setUsable(boolean usable)
 	{
-		this.meta = meta.getId();
+		model.usable = usable;
 	}
 
-	public void setUsable(boolean usable)
+	public CharacterController setPotionEffects(Collection<PotionEffect> potions)
 	{
-		this.usable = usable;
+
 	}
 
-	public void setPotionEffects(Collection<PotionEffect> potions)
+	public Set<PotionEffect> getPotionEffects()
 	{
-		if(potions != null)
-		{
-			if(potionEffects == null) potionEffects = Sets.newHashSet();
 
-			for(PotionEffect potion : potions)
-				potionEffects.add(StoaPotionEffect.of(potion).getId().toString());
-		}
-	}
-
-	private Set<PotionEffect> getPotionEffects()
-	{
-		if(potionEffects == null) potionEffects = Sets.newHashSet();
-
-		Set<PotionEffect> set = new HashSet<>();
-		for(String stringId : potionEffects)
-		{
-			try
-			{
-				PotionEffect potion = StoaPotionEffect.get(UUID.fromString(stringId)).getBukkitPotionEffect();
-				if(potion != null)
-				{
-					StoaPotionEffect.get(UUID.fromString(stringId)).remove();
-					set.add(potion);
-				}
-			}
-			catch(Exception ignored)
-			{
-			}
-		}
-
-		potionEffects.clear(); // METHOD MUST BE PRIVATE IF WE DO THIS HERE
-		return set;
-	}
-
-	public Collection<StoaPotionEffect> getRawPotionEffects()
-	{
-		if(potionEffects == null) potionEffects = Sets.newHashSet();
-		return Collections2.transform(potionEffects, new Function<String, StoaPotionEffect>()
-		{
-			@Override
-			public StoaPotionEffect apply(String s)
-			{
-				try
-				{
-					return StoaPotionEffect.get(UUID.fromString(s));
-				}
-				catch(Exception ignored)
-				{
-				}
-				return null;
-			}
-		});
 	}
 
 	public StoaPlayerInventory getInventory()
 	{
-		if(StoaPlayerInventory.get(inventory) == null) inventory = StoaPlayerInventory.createEmpty().getId();
-		return StoaPlayerInventory.get(inventory);
+
 	}
 
 	public StoaEnderInventory getDemigodsEnderInventory()
 	{
-		if(StoaEnderInventory.get(enderInventory) == null) enderInventory = StoaEnderInventory.create(this).getId();
-		return StoaEnderInventory.get(enderInventory);
-	}
 
-	public StoaCharacterMeta getMeta()
-	{
-		return StoaCharacterMeta.get(meta);
-	}
-
-	public OfflinePlayer getBukkitOfflinePlayer()
-	{
-		return Bukkit.getOfflinePlayer(getPlayerName());
-	}
-
-	public StoaPlayer getDemigodsPlayer()
-	{
-		return StoaPlayer.get(mojangAccount);
-	}
-
-	public Player getBukkitPlayer()
-	{
-		return getBukkitOfflinePlayer().getPlayer();
-	}
-
-	public String getName()
-	{
-		return name;
-	}
-
-	public boolean isActive()
-	{
-		return active;
-	}
-
-	public Location getLocation()
-	{
-		if(location == null) return null;
-		return StoaLocation.get(location).getBukkitLocation();
-	}
-
-	public Location getBedSpawn()
-	{
-		if(bedSpawn == null) return null;
-		return StoaLocation.get(bedSpawn).getBukkitLocation();
-	}
-
-	public GameMode getGameMode()
-	{
-		return gameMode;
-	}
-
-	public Location getCurrentLocation()
-	{
-		if(getBukkitOfflinePlayer().isOnline()) return getBukkitOfflinePlayer().getPlayer().getLocation();
-		return getLocation();
-	}
-
-	@Override
-	public StoaCharacter getRelatedCharacter()
-	{
-		return this;
-	}
-
-	@Override
-	public LivingEntity getEntity()
-	{
-		return getBukkitOfflinePlayer().getPlayer();
-	}
-
-	public UUID getMojangAccount()
-	{
-		return mojangAccount;
-	}
-
-	public String getPlayerName()
-	{
-		return StoaPlayer.get(mojangAccount).getPlayerName();
-	}
-
-	public Integer getLevel()
-	{
-		return level;
-	}
-
-	public boolean isAlive()
-	{
-		return alive;
-	}
-
-	public Double getHealth()
-	{
-		return health;
-	}
-
-	public Double getMaxHealth()
-	{
-		return getDeity().getMaxHealth();
-	}
-
-	public Integer getHunger()
-	{
-		return hunger;
-	}
-
-	public Float getExperience()
-	{
-		return experience;
-	}
-
-	public boolean isDeity(String deityName)
-	{
-		return getDeity().getName().equalsIgnoreCase(deityName);
-	}
-
-	public Deity getDeity()
-	{
-		return Stoa.getMythos().getDeity(this.deity);
 	}
 
 	public Collection<Deity> getMinorDeities()
 	{
-		return Collections2.transform(minorDeities, new Function<String, Deity>()
-		{
-			@Override
-			public Deity apply(String deity)
-			{
-				return Stoa.getMythos().getDeity(deity);
-			}
-		});
+
+	}
+
+	public Deity getDeity()
+	{
+		return Stoa.getMythos().getDeity(model.deity);
 	}
 
 	public Alliance getAlliance()
@@ -352,59 +186,31 @@ public class CharacterController extends Controller<CharacterModel> implements P
 		return getDeity().getAlliance();
 	}
 
-	public int getKillCount()
+	public CharacterController setKillCount(int amount)
 	{
-		return killCount;
+		model.killCount = amount;
+		return this;
 	}
 
-	public void setKillCount(int amount)
+	public CharacterController addKill()
 	{
-		killCount = amount;
-		save();
-	}
-
-	public void addKill()
-	{
-		killCount += 1;
-		save();
+		model.killCount += 1;
+		return this;
 	}
 
 	public int getDeathCount()
 	{
-		return deaths.size();
+
 	}
 
-	public void addDeath()
+	public CharacterController addDeath()
 	{
-		if(deaths == null) deaths = Sets.newHashSet();
-		deaths.add(Death.create(this).getId().toString());
-		save();
+
 	}
 
-	public void addDeath(StoaCharacter attacker)
+	public CharacterController addDeath(CharacterModel attacker)
 	{
-		deaths.add(Death.create(this, attacker).getId().toString());
-		save();
-	}
 
-	public Collection<Death> getDeaths()
-	{
-		if(deaths == null) deaths = Sets.newHashSet();
-		return Collections2.transform(deaths, new Function<String, Death>()
-		{
-			@Override
-			public Death apply(String s)
-			{
-				try
-				{
-					return Death.get(UUID.fromString(s));
-				}
-				catch(Exception ignored)
-				{
-				}
-				return null;
-			}
-		});
 	}
 
 	public Collection<StoaStructure> getOwnedStructures()
@@ -414,7 +220,7 @@ public class CharacterController extends Controller<CharacterModel> implements P
 			@Override
 			public boolean apply(StoaStructure data)
 			{
-				return data.getOwner().equals(getId());
+				return data.getOwner().equals(model.id());
 			}
 		});
 	}
@@ -433,7 +239,7 @@ public class CharacterController extends Controller<CharacterModel> implements P
 
 	public int getFavorRegen()
 	{
-		int favorRegenSkill = getMeta().getSkill(Skill.Type.FAVOR_REGEN) != null ? 4 * getMeta().getSkill(Skill.Type.FAVOR_REGEN).getLevel() : 0;
+		int favorRegenSkill = getSkill(Skill.Type.FAVOR_REGEN) != null ? 4 * getSkill(Skill.Type.FAVOR_REGEN).getLevel() : 0;
 		int regenRate = (int) Math.ceil(Configs.getSettingDouble("multipliers.favor") * (getDeity().getFavorRegen() + favorRegenSkill));
 		if(regenRate < 30) regenRate = 30;
 		return regenRate;
@@ -441,41 +247,24 @@ public class CharacterController extends Controller<CharacterModel> implements P
 
 	public void setCanPvp(boolean pvp)
 	{
-		StoaPlayer.of(getBukkitOfflinePlayer()).setCanPvp(pvp);
-	}
-
-	@Override
-	public boolean canPvp()
-	{
-		return StoaPlayer.get(getMojangAccount()).canPvp();
-	}
-
-	public boolean isUsable()
-	{
-		return usable;
+		PlayerController.fromId(model.playerId).setCanPvp(pvp).open().update().relinquish();
 	}
 
 	public void updateUseable()
 	{
-		usable = Stoa.getMythos().getDeity(this.deity) != null && Stoa.getMythos().getDeity(this.deity).getFlags().contains(Deity.Flag.PLAYABLE);
-	}
-
-	public UUID getId()
-	{
-		return id;
+		model.usable = getDeity() != null && getDeity().getFlags().contains(Deity.Flag.PLAYABLE);
 	}
 
 	public boolean alliedTo(Participant participant)
 	{
-		return getAlliance().equals(participant.getRelatedCharacter().getAlliance());
+		return getAlliance().equals(participant.getCharacter().getAlliance());
 	}
 
 	public Collection<StoaTameable> getPets()
 	{
-		return StoaTameable.findByOwner(id);
+		return StoaTameable.findByOwner(model.id());
 	}
 
-	@Override
 	public void remove()
 	{
 		// Define the DemigodsPlayer
@@ -508,7 +297,7 @@ public class CharacterController extends Controller<CharacterModel> implements P
 		return list;
 	}
 
-	public void sendAllianceMessage(String message)
+	public CharacterController sendAllianceMessage(String message)
 	{
 		StoaChatEvent chatEvent = new StoaChatEvent(message, Stoa.getServer().getOnlineCharactersWithAlliance(getAlliance()));
 		Bukkit.getPluginManager().callEvent(chatEvent);
@@ -516,13 +305,13 @@ public class CharacterController extends Controller<CharacterModel> implements P
 			player.sendMessage(message);
 	}
 
-	public void chatWithAlliance(String message)
+	public CharacterController chatWithAlliance(String message)
 	{
 		sendAllianceMessage(" " + ChatColor.GRAY + getAlliance() + "s " + ChatColor.DARK_GRAY + "" + CommonSymbol.BLACK_FLAG + " " + getDeity().getColor() + name + ChatColor.GRAY + ": " + ChatColor.RESET + message);
-		Messages.info("[" + getAlliance() + "]" + name + ": " + message);
+		Messages.info("[" + getAlliance() + "]" + model.name + ": " + message);
 	}
 
-	public void applyToPlayer(final Player player)
+	public CharacterController applyToPlayer(final Player player)
 	{
 		// Define variables
 		StoaPlayer playerSave = StoaPlayer.of(player);
@@ -572,74 +361,13 @@ public class CharacterController extends Controller<CharacterModel> implements P
 		StoaTameable.reownPets(player, this);
 	}
 
-	// -- STATIC GETTERS/SETTERS -- //
-
-	private static final DataAccess<UUID, StoaCharacter> DATA_ACCESS = new StoaCharacter(null);
-
-	public static StoaCharacter get(UUID id)
-	{
-		return DATA_ACCESS.getDirect(id);
-	}
-
-	public static Collection<StoaCharacter> all()
-	{
-		return DATA_ACCESS.allDirect();
-	}
-
-	// -- UTILITY METHODS -- //
-
-	public static StoaCharacter of(OfflinePlayer player)
-	{
-		return StoaPlayer.of(player).getCharacter();
-	}
-
-	public static StoaCharacter create(StoaPlayer player, String chosenDeity, String chosenName, boolean switchCharacter)
-	{
-		// Switch to new character
-		StoaCharacter character = create(player, chosenName, chosenDeity);
-		if(switchCharacter) player.switchCharacter(character);
-		return character;
-	}
-
-	public static StoaCharacter create(StoaPlayer player, String charName, String charDeity)
-	{
-		if(!charExists(charName))
-		{
-			// Create the DemigodsCharacter
-			return create(player, charName, Stoa.getMythos().getDeity(charDeity));
-		}
-		return null;
-	}
-
-	private static StoaCharacter create(final StoaPlayer player, final String charName, final Deity deity)
-	{
-		StoaCharacter character = new StoaCharacter();
-		character.generateId();
-		character.setAlive(true);
-		character.setMojangAccount(player);
-		character.setName(charName);
-		character.setDeity(deity);
-		character.setMinorDeities(new HashSet<String>(0));
-		character.setUsable(true);
-		character.setHealth(deity.getMaxHealth());
-		character.setHunger(20);
-		character.setExperience(0);
-		character.setLevel(0);
-		character.setKillCount(0);
-		character.setLocation(player.getBukkitOfflinePlayer().getPlayer().getLocation());
-		character.setMeta(StoaCharacterMeta.create(character));
-		character.save();
-
-		// Log the creation
-		Messages.info(English.LOG_CHARACTER_CREATED.getLine().replace("{character}", charName).replace("{id}", character.getId().toString()).replace("{deity}", deity.getName()));
-
-		return character;
-	}
-
 	public static void updateUsableCharacters()
 	{
-		for(StoaCharacter character : all())
+		CharacterController alias = new CharacterController();
+		Db db = openDb();
+		for(CharacterController character : db.from(alias).select())
 			character.updateUseable();
+		db.close();
 	}
 
 	public static boolean charExists(String name)
@@ -669,7 +397,7 @@ public class CharacterController extends Controller<CharacterModel> implements P
 	{
 		for(Player player : Bukkit.getOnlinePlayers())
 		{
-			StoaCharacter character = StoaCharacter.of(player);
+			CharacterController character = CharacterController.fromId().of(player);
 			if(character != null) character.getMeta().addFavor(character.getFavorRegen());
 		}
 	}
@@ -694,13 +422,13 @@ public class CharacterController extends Controller<CharacterModel> implements P
 	}
 
 	@Override
-	public Boolean hasCharacter()
+	public boolean hasCharacter()
 	{
 		return true;
 	}
 
 	@Override
-	public Boolean canPvp()
+	public boolean canPvp()
 	{
 		return PlayerController.fromId(model.playerId).canPvp();
 	}

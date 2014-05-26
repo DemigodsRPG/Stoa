@@ -12,6 +12,7 @@ import com.demigodsrpg.stoa.entity.player.attribute.Notification;
 import com.demigodsrpg.stoa.inventory.StoaEnderInventory;
 import com.demigodsrpg.stoa.inventory.StoaPlayerInventory;
 import com.demigodsrpg.stoa.language.English;
+import com.demigodsrpg.stoa.model.LocationModel;
 import com.demigodsrpg.stoa.model.PlayerModel;
 import com.demigodsrpg.stoa.util.ChatRecorder;
 import com.demigodsrpg.stoa.util.Configs;
@@ -219,7 +220,7 @@ public class PlayerController extends Controller<PlayerModel> implements Partici
 			character.setActive(false);
 
 			// Set the values
-			character.setHealth(player.getHealth() >= character.getMaxHealth() ? character.getMaxHealth() : player.getHealth());
+			character.setHealth(player.getHealth() >= character.getDeity().getMaxHealth() ? character.getDeity().getMaxHealth() : player.getHealth());
 			character.setHunger(player.getFoodLevel());
 			character.setLevel(player.getLevel());
 			character.setExperience(player.getExp());
@@ -237,7 +238,7 @@ public class PlayerController extends Controller<PlayerModel> implements Partici
 			character.saveInventory();
 
 			// Disown pets
-			StoaTameable.disownPets(character.getName());
+			StoaTameable.disownPets(character.model.name);
 
 			character.update();
 
@@ -251,7 +252,7 @@ public class PlayerController extends Controller<PlayerModel> implements Partici
 	{
 		final Player player = getEntity();
 
-		if(!newChar.getPlayerName().equals(model.playerName))
+		if(!newChar.model.playerId.equals(model.id()))
 		{
 			player.sendMessage(ChatColor.RED + "You can't do that.");
 			return this;
@@ -269,7 +270,7 @@ public class PlayerController extends Controller<PlayerModel> implements Partici
 		// Teleport them
 		try
 		{
-			player.teleport(newChar.getLocation());
+			player.teleport(LocationModel.fromId(newChar.model.locationId));
 		}
 		catch(Exception e)
 		{
@@ -468,13 +469,13 @@ public class PlayerController extends Controller<PlayerModel> implements Partici
 	}
 
 	@Override
-	public Boolean hasCharacter()
+	public boolean hasCharacter()
 	{
 		return model.currentCharacterId != null;
 	}
 
 	@Override
-	public Boolean canPvp()
+	public boolean canPvp()
 	{
 		return model.canPvp;
 	}

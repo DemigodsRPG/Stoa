@@ -25,6 +25,7 @@ public abstract class Controller<T extends Model>
 				return modelId.equals(model.id());
 			}
 		}, null);
+		close();
 		if(found != null) return control(found);
 		throw new NullPointerException("Cannot find data model from id.");
 	}
