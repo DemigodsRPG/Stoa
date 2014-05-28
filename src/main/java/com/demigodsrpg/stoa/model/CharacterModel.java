@@ -110,7 +110,7 @@ public class CharacterModel implements Model
 	}
 
 	@Override
-	public String name()
+	public String modelName()
 	{
 		return "CHARACTER";
 	}

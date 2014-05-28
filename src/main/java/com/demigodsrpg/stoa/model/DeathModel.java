@@ -28,7 +28,7 @@ public class DeathModel implements Model
 		// Optional data
 		if(killer.isPresent())
 		{
-			model.killerType = killer.get().getModel().name();
+			model.killerType = killer.get().getModel().modelName();
 			model.killerId = killer.get().getModel().id();
 		}
 
@@ -59,7 +59,7 @@ public class DeathModel implements Model
 	}
 
 	@Override
-	public String name()
+	public String modelName()
 	{
 		return "DEATH";
 	}

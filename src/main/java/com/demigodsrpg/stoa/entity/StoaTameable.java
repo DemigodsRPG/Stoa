@@ -27,7 +27,7 @@ public class StoaTameable extends DataAccess<UUID, StoaTameable> implements Part
 	private String animalTamer;
 	private boolean PvP;
 	private UUID entityUUID;
-	private UUID owner;
+	private String owner;
 
 	public StoaTameable()
 	{
@@ -42,7 +42,7 @@ public class StoaTameable extends DataAccess<UUID, StoaTameable> implements Part
 		if(conf.getString("animalTamer") != null) tameable.animalTamer = conf.getString("animalTamer");
 		tameable.PvP = conf.getBoolean("PvP");
 		tameable.entityUUID = UUID.fromString(conf.getString("entityUUID"));
-		if(conf.getString("owner") != null) tameable.owner = UUID.fromString(conf.getString("owner"));
+		if(conf.getString("owner") != null) tameable.owner = conf.getString("owner");
 		return tameable;
 	}
 
@@ -54,7 +54,7 @@ public class StoaTameable extends DataAccess<UUID, StoaTameable> implements Part
 		if(animalTamer != null) map.put("animalTamer", animalTamer);
 		map.put("PvP", PvP);
 		map.put("entityUUID", entityUUID.toString());
-		if(owner != null) map.put("owner", owner.toString());
+		if(owner != null) map.put("owner", owner);
 		return map;
 	}
 
@@ -79,7 +79,7 @@ public class StoaTameable extends DataAccess<UUID, StoaTameable> implements Part
 	public void setOwnerId(String playerName, UUID owner)
 	{
 		this.animalTamer = playerName;
-		this.owner = owner;
+		this.owner = owner.toString();
 		save();
 	}
 
@@ -117,7 +117,7 @@ public class StoaTameable extends DataAccess<UUID, StoaTameable> implements Part
 		return null;
 	}
 
-	public UUID getOwnerId()
+	public String getOwnerId()
 	{
 		return owner;
 	}
@@ -254,7 +254,7 @@ public class StoaTameable extends DataAccess<UUID, StoaTameable> implements Part
 		});
 	}
 
-	public static Collection<StoaTameable> findByOwner(final UUID ownerId)
+	public static Collection<StoaTameable> findByOwner(final String ownerId)
 	{
 		return Collections2.filter(all(), new Predicate<StoaTameable>()
 		{

@@ -1,6 +1,8 @@
 package com.demigodsrpg.stoa;
 
 import com.censoredsoftware.shaded.com.iciql.Db;
+import com.demigodsrpg.stoa.controller.CharacterController;
+import com.demigodsrpg.stoa.controller.PlayerController;
 import com.demigodsrpg.stoa.data.DataManager;
 import com.demigodsrpg.stoa.data.StoaWorld;
 import com.demigodsrpg.stoa.data.TaskManager;
@@ -8,8 +10,6 @@ import com.demigodsrpg.stoa.data.WorldDataManager;
 import com.demigodsrpg.stoa.deity.Ability;
 import com.demigodsrpg.stoa.deity.Alliance;
 import com.demigodsrpg.stoa.deity.Deity;
-import com.demigodsrpg.stoa.entity.player.StoaCharacter;
-import com.demigodsrpg.stoa.entity.player.StoaPlayer;
 import com.demigodsrpg.stoa.entity.player.attribute.Skill;
 import com.demigodsrpg.stoa.item.DivineItem;
 import com.demigodsrpg.stoa.model.CharacterModel;
@@ -18,16 +18,14 @@ import com.demigodsrpg.stoa.model.PlayerModel;
 import com.demigodsrpg.stoa.mythos.Mythos;
 import com.demigodsrpg.stoa.mythos.MythosSet;
 import com.demigodsrpg.stoa.structure.StoaStructureType;
+import com.demigodsrpg.stoa.util.Configs;
 import com.demigodsrpg.stoa.util.Messages;
 import com.demigodsrpg.stoa.util.Zones;
-import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Iterators;
 import com.google.common.collect.Sets;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -125,7 +123,7 @@ public class StoaServer
 			loadPermissions(true);
 
 			// Update characters
-			StoaCharacter.updateUsableCharacters();
+			CharacterController.updateUsableCharacters();
 
 			// Start threads
 			TaskManager.startThreads();
@@ -147,8 +145,8 @@ public class StoaServer
 			else Messages.warning(("Without Spigot, some features may not work."));
 
 			// Clean skills
-			for(StoaCharacter character : StoaCharacter.all())
-				character.getMeta().cleanSkills();
+			for(CharacterController character : CharacterController.all())
+				character.cleanSkills();
 
 			return true;
 		}
@@ -338,43 +336,36 @@ public class StoaServer
 
 	// -- PLAYER -- //
 
-	public Collection<StoaPlayer> getAllPlayers()
+	public Collection<PlayerController> getAllPlayers()
 	{
-		return StoaPlayer.all();
+		return PlayerController.all();
 	}
 
-	public Collection<StoaPlayer> getOnlinePlayers()
+	public Collection<PlayerController> getOnlinePlayers()
 	{
-		return Collections2.filter(StoaPlayer.all(), new Predicate<StoaPlayer>()
+		return Collections2.filter(PlayerController.all(), new Predicate<PlayerController>()
 		{
 			@Override
-			public boolean apply(StoaPlayer player)
+			public boolean apply(PlayerController player)
 			{
-				return player.getBukkitOfflinePlayer().isOnline();
+				return player.getEntity() != null;
 			}
 		});
 	}
 
 	// -- MORTAL -- //
 
-	public Collection<OfflinePlayer> getMortals()
+	public Collection<PlayerController> getMortals()
 	{
-		return Collections2.transform(Collections2.filter(StoaPlayer.all(), new Predicate<StoaPlayer>()
+		return Collections2.transform(Collections2.filter(PlayerController.all(), new Predicate<PlayerController>()
 		{
 			@Override
-			public boolean apply(StoaPlayer player)
+			public boolean apply(PlayerController player)
 			{
-				StoaCharacter character = player.getCharacter();
-				return character == null || !character.isUsable() || !character.isActive();
+				CharacterController character = player.getCharacter();
+				return character == null || !character.getModel().usable || !character.getModel().active;
 			}
-		}), new Function<StoaPlayer, OfflinePlayer>()
-		{
-			@Override
-			public OfflinePlayer apply(StoaPlayer player)
-			{
-				return player.getBukkitOfflinePlayer();
-			}
-		});
+		}));
 	}
 
 	public Set<Player> getOnlineMortals()
@@ -384,161 +375,46 @@ public class StoaServer
 			@Override
 			public boolean apply(Player player)
 			{
-				StoaCharacter character = StoaPlayer.of(player).getCharacter();
-				return character == null || !character.isUsable() || !character.isActive();
+				CharacterController character = CharacterController.currentFromPlayer(player);
+				return character == null || !character.getModel().usable || !character.getModel().active;
 			}
 		});
 	}
 
 	// -- CHARACTER -- //
 
-	public StoaCharacter getCharacter(final String name)
+	public CharacterController getCharacter(String name)
 	{
-		try
+		return CharacterController.fromName(name);
+	}
+
+	public Collection<CharacterModel> getActiveCharacters()
+	{
+		CharacterModel alias = new CharacterModel();
+		Db db = openDb();
+		List<CharacterModel> found = db.from(alias).where(alias.usable).is(true).and(alias.active).is(true).select();
+		db.close();
+		return found;
+	}
+
+	public Collection<CharacterModel> getUsableCharacters()
+	{
+		CharacterModel alias = new CharacterModel();
+		Db db = openDb();
+		List<CharacterModel> found = db.from(alias).where(alias.usable).is(true).select();
+		db.close();
+		return found;
+	}
+
+	public Collection<CharacterController> getOnlineCharacters()
+	{
+		List<CharacterController> onlineCharacters = new ArrayList<>();
+		for(Player player : Bukkit.getOnlinePlayers())
 		{
-			return Iterators.find(StoaCharacter.all().iterator(), new Predicate<StoaCharacter>()
-			{
-				@Override
-				public boolean apply(StoaCharacter loaded)
-				{
-					return loaded.getName().equalsIgnoreCase(name);
-				}
-			});
+			CharacterController online = CharacterController.currentFromPlayer(player);
+			if(online != null) onlineCharacters.add(online);
 		}
-		catch(Exception ignored)
-		{
-		}
-		return null;
-	}
-
-	public Collection<StoaCharacter> getActiveCharacters()
-	{
-		return Collections2.filter(StoaCharacter.all(), new Predicate<StoaCharacter>()
-		{
-			@Override
-			public boolean apply(StoaCharacter character)
-			{
-				return character.isUsable() && character.isActive();
-			}
-		});
-	}
-
-	public Collection<StoaCharacter> getUsableCharacters()
-	{
-		return Collections2.filter(StoaCharacter.all(), new Predicate<StoaCharacter>()
-		{
-			@Override
-			public boolean apply(StoaCharacter character)
-			{
-				return character.isUsable();
-			}
-		});
-	}
-
-	public Collection<StoaCharacter> getOnlineCharactersWithDeity(final String deity)
-	{
-		return getCharactersWithPredicate(new Predicate<StoaCharacter>()
-		{
-			@Override
-			public boolean apply(StoaCharacter character)
-			{
-				return character.isActive() && character.getBukkitOfflinePlayer().isOnline() && character.getDeity().getName().equalsIgnoreCase(deity);
-			}
-		});
-	}
-
-	public Collection<StoaCharacter> getOnlineCharactersWithAbility(final String abilityName)
-	{
-		return getCharactersWithPredicate(new Predicate<StoaCharacter>()
-		{
-			@Override
-			public boolean apply(StoaCharacter character)
-			{
-				if(character.isActive() && character.getBukkitOfflinePlayer().isOnline())
-				{
-					for(Ability abilityToCheck : character.getDeity().getAbilities())
-						if(abilityToCheck.getName().equalsIgnoreCase(abilityName)) return true;
-				}
-				return false;
-			}
-		});
-	}
-
-	public Collection<StoaCharacter> getOnlineCharactersWithAlliance(final Alliance alliance)
-	{
-		return getCharactersWithPredicate(new Predicate<StoaCharacter>()
-		{
-			@Override
-			public boolean apply(StoaCharacter character)
-			{
-				return character.isActive() && character.getBukkitOfflinePlayer().isOnline() && character.getAlliance().equals(alliance);
-			}
-		});
-	}
-
-	public Collection<StoaCharacter> getOnlineCharactersWithoutAlliance(final Alliance alliance)
-	{
-		return getCharactersWithPredicate(new Predicate<StoaCharacter>()
-		{
-			@Override
-			public boolean apply(StoaCharacter character)
-			{
-				return character.isActive() && character.getBukkitOfflinePlayer().isOnline() && !character.getAlliance().equals(alliance);
-			}
-		});
-	}
-
-	public Collection<StoaCharacter> getOnlineCharactersBelowAscension(final int ascension)
-	{
-		return getCharactersWithPredicate(new Predicate<StoaCharacter>()
-		{
-			@Override
-			public boolean apply(StoaCharacter character)
-			{
-				return character.isActive() && character.getBukkitOfflinePlayer().isOnline() && character.getMeta().getAscensions() < ascension;
-			}
-		});
-	}
-
-	public Collection<StoaCharacter> getOnlineCharacters()
-	{
-		return getCharactersWithPredicate(new Predicate<StoaCharacter>()
-		{
-			@Override
-			public boolean apply(StoaCharacter character)
-			{
-				return character.isActive() && character.getBukkitOfflinePlayer().isOnline();
-			}
-		});
-	}
-
-	public Collection<StoaCharacter> getAllCharactersWithDeity(final String deity)
-	{
-		return getCharactersWithPredicate(new Predicate<StoaCharacter>()
-		{
-			@Override
-			public boolean apply(StoaCharacter character)
-			{
-				return character.isActive() && character.getDeity().getName().equalsIgnoreCase(deity);
-			}
-		});
-	}
-
-	public Collection<StoaCharacter> getAllCharactersWithAlliance(final Alliance alliance)
-	{
-		return getCharactersWithPredicate(new Predicate<StoaCharacter>()
-		{
-			@Override
-			public boolean apply(StoaCharacter character)
-			{
-				return character.isActive() && character.getAlliance().equals(alliance);
-			}
-		});
-	}
-
-	public Collection<StoaCharacter> getCharactersWithPredicate(Predicate<StoaCharacter> predicate)
-	{
-		return Collections2.filter(getUsableCharacters(), predicate);
+		return onlineCharacters;
 	}
 
 	// -- WORLD -- //
@@ -552,4 +428,10 @@ public class StoaServer
 	{
 		return WorldDataManager.getWorlds();
 	}
+
+	public static Db openDb()
+	{
+		return Db.open("jdbc:" + Configs.getSettingString("db.type") + "://" + Configs.getSettingString("db.host") + ":" + Configs.getSettingString("db.port") + "/" + Configs.getSettingString("db.name"), Configs.getSettingString("db.user"), Configs.getSettingString("db.pass"));
+	}
+
 }

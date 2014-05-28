@@ -312,7 +312,7 @@ public class StoaStructure extends WorldDataAccess<UUID, StoaStructure>
 		return sanctity;
 	}
 
-	public UUID getOwner()
+	public String getOwner()
 	{
 		return this.owner;
 	}

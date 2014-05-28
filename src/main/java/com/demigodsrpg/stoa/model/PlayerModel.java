@@ -76,7 +76,7 @@ public class PlayerModel implements Model
 	}
 
 	@Override
-	public String name()
+	public String modelName()
 	{
 		return "PLAYER";
 	}

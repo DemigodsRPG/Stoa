@@ -1,8 +1,8 @@
 package com.demigodsrpg.stoa;
 
+import com.demigodsrpg.stoa.controller.CharacterController;
+import com.demigodsrpg.stoa.controller.PlayerController;
 import com.demigodsrpg.stoa.data.StoaWorld;
-import com.demigodsrpg.stoa.entity.player.StoaCharacter;
-import com.demigodsrpg.stoa.entity.player.StoaPlayer;
 import com.demigodsrpg.stoa.mythos.Mythos;
 import org.bukkit.conversations.ConversationFactory;
 
@@ -14,6 +14,7 @@ import java.util.Collection;
 public class Stoa
 {
 	// -- CONSTANTS -- //
+
 	private static final StoaServer STOA_SERVER = new StoaServer();
 	private static final ConversationFactory CONVERSATION_FACTORY = new ConversationFactory(StoaPlugin.getInst());
 
@@ -42,12 +43,12 @@ public class Stoa
 
 	// -- PASS UP DATA FROM STOA SERVER CLASS -- //
 
-	public static Collection<StoaPlayer> getOnlinePlayers()
+	public static Collection<PlayerController> getOnlinePlayers()
 	{
 		return getServer().getOnlinePlayers();
 	}
 
-	public static Collection<StoaCharacter> getOnlineCharacters()
+	public static Collection<CharacterController> getOnlineCharacters()
 	{
 		return getServer().getOnlineCharacters();
 	}

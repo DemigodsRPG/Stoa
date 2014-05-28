@@ -2,9 +2,10 @@ package com.demigodsrpg.stoa.controller;
 
 import com.censoredsoftware.shaded.com.iciql.Db;
 import com.demigodsrpg.stoa.model.Model;
-import com.demigodsrpg.stoa.util.Configs;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
+
+import static com.demigodsrpg.stoa.StoaServer.openDb;
 
 public abstract class Controller<T extends Model>
 {
@@ -78,9 +79,4 @@ public abstract class Controller<T extends Model>
 
 	protected T model;
 	protected Db DB;
-
-	protected static Db openDb()
-	{
-		return Db.open("jdbc:" + Configs.getSettingString("db.type") + "://" + Configs.getSettingString("db.host") + ":" + Configs.getSettingString("db.port") + "/" + Configs.getSettingString("db.name"), Configs.getSettingString("db.user"), Configs.getSettingString("db.pass"));
-	}
 }

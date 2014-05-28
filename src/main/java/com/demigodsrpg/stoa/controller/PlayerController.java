@@ -2,6 +2,7 @@ package com.demigodsrpg.stoa.controller;
 
 import com.censoredsoftware.library.data.ServerData;
 import com.censoredsoftware.library.mcidprovider.McIdProvider;
+import com.censoredsoftware.shaded.com.iciql.Db;
 import com.demigodsrpg.stoa.StoaPlugin;
 import com.demigodsrpg.stoa.battle.Battle;
 import com.demigodsrpg.stoa.battle.Participant;
@@ -12,6 +13,7 @@ import com.demigodsrpg.stoa.entity.player.attribute.Notification;
 import com.demigodsrpg.stoa.inventory.StoaEnderInventory;
 import com.demigodsrpg.stoa.inventory.StoaPlayerInventory;
 import com.demigodsrpg.stoa.language.English;
+import com.demigodsrpg.stoa.model.CharacterModel;
 import com.demigodsrpg.stoa.model.LocationModel;
 import com.demigodsrpg.stoa.model.PlayerModel;
 import com.demigodsrpg.stoa.util.ChatRecorder;
@@ -19,7 +21,6 @@ import com.demigodsrpg.stoa.util.Configs;
 import com.demigodsrpg.stoa.util.Messages;
 import com.demigodsrpg.stoa.util.Zones;
 import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import org.bukkit.Bukkit;
@@ -284,18 +285,6 @@ public class PlayerController extends Controller<PlayerModel> implements Partici
 		return this;
 	}
 
-	public Set<StoaCharacter> getCharacters()
-	{
-		return Sets.newHashSet(Collections2.filter(StoaCharacter.all(), new Predicate<StoaCharacter>()
-		{
-			@Override
-			public boolean apply(StoaCharacter character)
-			{
-				return character != null && character.getMojangAccount().equals(mojangAccount) && character.isUsable();
-			}
-		}));
-	}
-
 	public Set<StoaCharacter> getUsableCharacters()
 	{
 		return Sets.filter(getCharacters(), new Predicate<StoaCharacter>()
@@ -446,6 +435,16 @@ public class PlayerController extends Controller<PlayerModel> implements Partici
 		for(StoaCharacter character : of(player).getCharacters())
 			if(character.getName().equalsIgnoreCase(charName)) return true;
 		return false;
+	}
+
+	public List<CharacterModel> getCharacters()
+	{
+		CharacterModel alias = new CharacterModel();
+		Db db = openDb();
+		List<CharacterModel> found = db.from(alias).where(alias.playerId).is(model.id()).select();
+		db.close();
+
+		return found;
 	}
 
 	@Override

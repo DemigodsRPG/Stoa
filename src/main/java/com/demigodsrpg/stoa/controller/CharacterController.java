@@ -4,21 +4,19 @@ import com.censoredsoftware.library.data.ServerData;
 import com.censoredsoftware.library.messages.CommonSymbol;
 import com.censoredsoftware.shaded.com.iciql.Db;
 import com.demigodsrpg.stoa.Stoa;
-import com.demigodsrpg.stoa.StoaPlugin;
+import com.demigodsrpg.stoa.StoaServer;
 import com.demigodsrpg.stoa.battle.Participant;
 import com.demigodsrpg.stoa.data.DataManager;
 import com.demigodsrpg.stoa.deity.Ability;
 import com.demigodsrpg.stoa.deity.Alliance;
 import com.demigodsrpg.stoa.deity.Deity;
 import com.demigodsrpg.stoa.entity.StoaTameable;
-import com.demigodsrpg.stoa.entity.player.StoaPlayer;
 import com.demigodsrpg.stoa.entity.player.attribute.Skill;
-import com.demigodsrpg.stoa.entity.player.attribute.StoaPotionEffect;
 import com.demigodsrpg.stoa.event.StoaChatEvent;
-import com.demigodsrpg.stoa.inventory.StoaEnderInventory;
-import com.demigodsrpg.stoa.inventory.StoaPlayerInventory;
 import com.demigodsrpg.stoa.location.StoaLocation;
 import com.demigodsrpg.stoa.model.CharacterModel;
+import com.demigodsrpg.stoa.model.EnderChestInventoryModel;
+import com.demigodsrpg.stoa.model.PlayerInventoryModel;
 import com.demigodsrpg.stoa.model.PlayerModel;
 import com.demigodsrpg.stoa.structure.StoaStructure;
 import com.demigodsrpg.stoa.structure.StoaStructureType;
@@ -33,7 +31,6 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Collection;
 import java.util.List;
@@ -45,7 +42,7 @@ public class CharacterController extends Controller<CharacterModel> implements P
 	public static CharacterController fromName(String characterName)
 	{
 		CharacterModel alias = new CharacterModel();
-		Db db = openDb();
+		Db db = StoaServer.openDb();
 		CharacterModel model = Iterables.getFirst(db.from(alias).where(alias.name).is(characterName).select(), null);
 		db.close();
 		if(model == null) return null;
@@ -57,7 +54,7 @@ public class CharacterController extends Controller<CharacterModel> implements P
 		return new CharacterController().control(characterId);
 	}
 
-	public static CharacterController fromPlayer(Player player)
+	public static CharacterController currentFromPlayer(Player player)
 	{
 		return PlayerController.fromName(player.getName()).getCharacter();
 	}
@@ -65,31 +62,37 @@ public class CharacterController extends Controller<CharacterModel> implements P
 	public CharacterController setName(String name)
 	{
 		model.name = name;
+		return this;
 	}
 
 	public CharacterController setDeity(Deity deity)
 	{
 		model.deity = deity.getName();
+		return this;
 	}
 
 	public CharacterController setMinorDeities(Set<String> set)
 	{
-		this.minorDeities = set;
+		// this.minorDeities = set;
+		return this;
 	}
 
 	public CharacterController addMinorDeity(Deity deity)
 	{
-		this.minorDeities.add(deity.getName());
+		// this.minorDeities.add(deity.getName());
+		return this;
 	}
 
 	public CharacterController removeMinorDeity(Deity deity)
 	{
-		this.minorDeities.remove(deity.getName());
+		// this.minorDeities.remove(deity.getName());
+		return this;
 	}
 
 	public CharacterController setPlayer(PlayerModel player)
 	{
 		model.playerId = player.id();
+		return this;
 	}
 
 	public CharacterController setActive(boolean option)
@@ -100,8 +103,8 @@ public class CharacterController extends Controller<CharacterModel> implements P
 
 	public CharacterController saveInventory()
 	{
-		model.inventoryId = StoaPlayerInventory.create(this).getId();
-		model.enderInventory = StoaEnderInventory.create(this).getId();
+		model.inventoryId = new PlayerInventoryController().control(new PlayerInventoryModel(this)).open().update().close().model.id();
+		model.enderInventory = new EnderChestInventoryController().control(new EnderChestInventoryModel(this)).open().update().close().model.id();
 		return this;
 	}
 
@@ -114,66 +117,78 @@ public class CharacterController extends Controller<CharacterModel> implements P
 	public CharacterController setHealth(double health)
 	{
 		model.health = health;
+		return this;
 	}
 
 	public CharacterController setHunger(int hunger)
 	{
 		model.hunger = hunger;
+		return this;
 	}
 
 	public CharacterController setLevel(int level)
 	{
 		model.level = level;
+		return this;
 	}
 
 	public CharacterController setExperience(float exp)
 	{
 		model.experience = exp;
+		return this;
 	}
 
 	public CharacterController setLocation(Location location)
 	{
-		model.locationId = StoaLocation.of(location).getId();
+		model.locationId = StoaLocation.of(location).getId().toString();
+		return this;
 	}
 
 	public CharacterController setBedSpawn(Location location)
 	{
-		model.bedSpawnId = StoaLocation.of(location).getId();
+		model.bedSpawnId = StoaLocation.of(location).getId().toString();
+		return this;
 	}
 
 	public CharacterController setGameMode(GameMode gameMode)
 	{
 		model.gameMode = gameMode;
+		return this;
 	}
 
 	public CharacterController setUsable(boolean usable)
 	{
 		model.usable = usable;
+		return this;
 	}
 
 	public CharacterController setPotionEffects(Collection<PotionEffect> potions)
 	{
-
+		return this;
 	}
 
 	public Set<PotionEffect> getPotionEffects()
 	{
-
+		// TODO
+		return null;
 	}
 
-	public StoaPlayerInventory getInventory()
+	public PlayerInventoryController getInventory()
 	{
-
+		// TODO
+		return null;
 	}
 
-	public StoaEnderInventory getDemigodsEnderInventory()
+	public EnderChestInventoryController getEnderInventory()
 	{
-
+		// TODO
+		return null;
 	}
 
 	public Collection<Deity> getMinorDeities()
 	{
-
+		// TODO
+		return null;
 	}
 
 	public Deity getDeity()
@@ -200,17 +215,18 @@ public class CharacterController extends Controller<CharacterModel> implements P
 
 	public int getDeathCount()
 	{
-
+		// TODO
+		return -1;
 	}
 
 	public CharacterController addDeath()
 	{
-
+		return this;
 	}
 
 	public CharacterController addDeath(CharacterModel attacker)
 	{
-
+		return this;
 	}
 
 	public Collection<StoaStructure> getOwnedStructures()
@@ -267,22 +283,22 @@ public class CharacterController extends Controller<CharacterModel> implements P
 
 	public void remove()
 	{
-		// Define the DemigodsPlayer
-		StoaPlayer stoaPlayer = StoaPlayer.of(getBukkitOfflinePlayer());
+		// Define controller
+		PlayerController player = PlayerController.fromId(model.playerId);
 
 		// Switch the player to mortal
-		if(getBukkitOfflinePlayer().isOnline() && stoaPlayer.getCharacter().getName().equalsIgnoreCase(getName())) stoaPlayer.setToMortal();
+		if(getEntity() != null && player.model.currentCharacterId.equals(model.id()))
+		{
+			player.setToMortal();
+			player.resetCurrent();
+		}
 
-		// Remove the data
-		if(stoaPlayer.getCharacter() != null && stoaPlayer.getCharacter().getName().equalsIgnoreCase(getName())) stoaPlayer.resetCurrent();
 		for(StoaStructure structure : StoaStructureType.Util.getStructuresWithFlag(StoaStructureType.Flag.DELETE_WITH_OWNER))
-			if(structure.hasOwner() && structure.getOwner().equals(getId())) structure.remove();
-		for(StoaPotionEffect potion : getRawPotionEffects())
-			potion.remove();
+			if(structure.hasOwner() && structure.getOwner().equals(model.id())) structure.remove();
+		// for(StoaPotionEffect potion : getPotionEffects())
+		// 	potion.remove();
 		getInventory().remove();
-		getDemigodsEnderInventory().remove();
-		getMeta().remove();
-		super.remove();
+		getEnderInventory().remove();
 	}
 
 	public List<Ability> getAbilities()
@@ -303,18 +319,20 @@ public class CharacterController extends Controller<CharacterModel> implements P
 		Bukkit.getPluginManager().callEvent(chatEvent);
 		if(!chatEvent.isCancelled()) for(Player player : chatEvent.getRecipients())
 			player.sendMessage(message);
+		return this;
 	}
 
 	public CharacterController chatWithAlliance(String message)
 	{
-		sendAllianceMessage(" " + ChatColor.GRAY + getAlliance() + "s " + ChatColor.DARK_GRAY + "" + CommonSymbol.BLACK_FLAG + " " + getDeity().getColor() + name + ChatColor.GRAY + ": " + ChatColor.RESET + message);
+		sendAllianceMessage(" " + ChatColor.GRAY + getAlliance() + "s " + ChatColor.DARK_GRAY + "" + CommonSymbol.BLACK_FLAG + " " + getDeity().getColor() + model.name + ChatColor.GRAY + ": " + ChatColor.RESET + message);
 		Messages.info("[" + getAlliance() + "]" + model.name + ": " + message);
+		return this;
 	}
 
 	public CharacterController applyToPlayer(final Player player)
 	{
 		// Define variables
-		StoaPlayer playerSave = StoaPlayer.of(player);
+		PlayerController playerSave = PlayerController.fromId(model.playerId);
 
 		// Set character to active
 		setActive(true);
@@ -329,20 +347,19 @@ public class CharacterController extends Controller<CharacterModel> implements P
 		if(playerSave.getCharacters().size() == 1) saveInventory();
 		else player.getEnderChest().clear();
 		getInventory().setToPlayer(player);
-		getDemigodsEnderInventory().setToPlayer(player);
+		getEnderInventory().setToPlayer(player);
 
-		// Update health, experience, and name
-		player.setDisplayName(getDeity().getColor() + getName());
-		player.setPlayerListName(getDeity().getColor() + getName());
-		player.setMaxHealth(getMaxHealth());
-		player.setHealth(getHealth() >= getMaxHealth() ? getMaxHealth() : getHealth());
-		player.setFoodLevel(getHunger());
-		player.setExp(getExperience());
-		player.setLevel(getLevel());
+		// Update health, experience
+		player.setMaxHealth(getDeity().getMaxHealth());
+		player.setHealth(model.health >= getDeity().getMaxHealth() ? getDeity().getMaxHealth() : model.health);
+		player.setFoodLevel(model.hunger);
+		player.setExp(model.experience);
+		player.setLevel(model.level);
 		for(PotionEffect potion : player.getActivePotionEffects())
 			player.removePotionEffect(potion.getType());
 		Set<PotionEffect> potionEffects = getPotionEffects();
 		if(!potionEffects.isEmpty()) player.addPotionEffects(potionEffects);
+		/*
 		Bukkit.getScheduler().scheduleSyncDelayedTask(StoaPlugin.getInst(), new BukkitRunnable()
 		{
 			@Override
@@ -351,20 +368,22 @@ public class CharacterController extends Controller<CharacterModel> implements P
 				if(getBedSpawn() != null) player.setBedSpawnLocation(getBedSpawn());
 			}
 		}, 1);
-		if(gameMode != null) player.setGameMode(gameMode);
+		*/
+		if(model.gameMode != null) player.setGameMode(model.gameMode);
 
 		// Set player display name
-		player.setDisplayName(getDeity().getColor() + getName());
-		player.setPlayerListName(getDeity().getColor() + getName());
+		player.setDisplayName(getDeity().getColor() + model.name);
+		player.setPlayerListName(getDeity().getColor() + model.name); // FIXME
 
 		// Re-own pets
-		StoaTameable.reownPets(player, this);
+		// StoaTameable.reownPets(player, this);
+		return this;
 	}
 
 	public static void updateUsableCharacters()
 	{
 		CharacterController alias = new CharacterController();
-		Db db = openDb();
+		Db db = StoaServer.openDb();
 		for(CharacterController character : db.from(alias).select())
 			character.updateUseable();
 		db.close();
@@ -375,19 +394,19 @@ public class CharacterController extends Controller<CharacterModel> implements P
 		return Stoa.getServer().getCharacter(name) != null;
 	}
 
-	public static boolean isCooledDown(StoaCharacter character, String abilityName)
+	public static boolean isCooledDown(CharacterController character, String abilityName)
 	{
-		return !ServerData.exists(DataManager.DATA_MANAGER, character.getName(), abilityName + "_cooldown");
+		return !ServerData.exists(DataManager.DATA_MANAGER, character.model.name, abilityName + "_cooldown");
 	}
 
-	public static void setCooldown(StoaCharacter character, String abilityName, int cooldown)
+	public static void setCooldown(CharacterController character, String abilityName, int cooldown)
 	{
-		ServerData.put(DataManager.DATA_MANAGER, character.getName(), abilityName + "_cooldown", true, cooldown, TimeUnit.SECONDS);
+		ServerData.put(DataManager.DATA_MANAGER, character.model.name, abilityName + "_cooldown", true, cooldown, TimeUnit.SECONDS);
 	}
 
-	public static Long getCooldown(StoaCharacter character, String abilityName)
+	public static Long getCooldown(CharacterController character, String abilityName)
 	{
-		return ServerData.find(DataManager.DATA_MANAGER, character.getName(), abilityName + "_cooldown").getExpiration();
+		return ServerData.find(DataManager.DATA_MANAGER, character.model.name, abilityName + "_cooldown").getExpiration();
 	}
 
 	/**
@@ -395,11 +414,8 @@ public class CharacterController extends Controller<CharacterModel> implements P
 	 */
 	public static void updateFavor()
 	{
-		for(Player player : Bukkit.getOnlinePlayers())
-		{
-			CharacterController character = CharacterController.fromId().of(player);
-			if(character != null) character.getMeta().addFavor(character.getFavorRegen());
-		}
+		for(CharacterController character : Stoa.getOnlineCharacters())
+			character.addFavor(character.getDeity().getFavorRegen());
 	}
 
 	@Override

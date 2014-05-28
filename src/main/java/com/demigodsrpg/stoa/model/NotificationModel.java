@@ -77,7 +77,7 @@ public class NotificationModel implements Model
 	}
 
 	@Override
-	public String name()
+	public String modelName()
 	{
 		return "NOTIFICATION";
 	}

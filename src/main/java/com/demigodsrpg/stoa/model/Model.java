@@ -4,5 +4,5 @@ public interface Model
 {
 	String id();
 
-	String name();
+	String modelName();
 }
