@@ -18,8 +18,8 @@ import com.demigodsrpg.stoa.model.LocationModel;
 import com.demigodsrpg.stoa.model.PlayerModel;
 import com.demigodsrpg.stoa.util.ChatRecorder;
 import com.demigodsrpg.stoa.util.Configs;
-import com.demigodsrpg.stoa.util.Messages;
-import com.demigodsrpg.stoa.util.Zones;
+import com.demigodsrpg.stoa.util.MessageUtil;
+import com.demigodsrpg.stoa.util.ZoneUtil;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
@@ -96,7 +96,7 @@ public class PlayerController extends Controller<PlayerModel> implements Partici
 
 		// Define variables
 		final Player player = getEntity();
-		final boolean inNoPvpZone = Zones.inNoPvpZone(player.getLocation());
+		final boolean inNoPvpZone = ZoneUtil.inNoPvpZone(player.getLocation());
 
 		if(getCharacter() != null && Battle.isInBattle(getCharacter())) return this;
 
@@ -120,7 +120,7 @@ public class PlayerController extends Controller<PlayerModel> implements Partici
 				@Override
 				public void run()
 				{
-					if(Zones.inNoPvpZone(player.getLocation()))
+					if(ZoneUtil.inNoPvpZone(player.getLocation()))
 					{
 						if(getCharacter() != null && Battle.isInBattle(getCharacter())) return;
 						setCanPvp(false);
@@ -275,7 +275,7 @@ public class PlayerController extends Controller<PlayerModel> implements Partici
 		}
 		catch(Exception e)
 		{
-			Messages.warning("There was a problem while teleporting a player to their character.");
+			MessageUtil.warning("There was a problem while teleporting a player to their character.");
 		}
 
 		// Save instances

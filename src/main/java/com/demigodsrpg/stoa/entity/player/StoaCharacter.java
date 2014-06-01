@@ -25,7 +25,7 @@ import com.demigodsrpg.stoa.location.StoaLocation;
 import com.demigodsrpg.stoa.structure.StoaStructure;
 import com.demigodsrpg.stoa.structure.StoaStructureType;
 import com.demigodsrpg.stoa.util.Configs;
-import com.demigodsrpg.stoa.util.Messages;
+import com.demigodsrpg.stoa.util.MessageUtil;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -625,7 +625,7 @@ public class StoaCharacter extends DataAccess<UUID, StoaCharacter> implements Pa
 	public void chatWithAlliance(String message)
 	{
 		sendAllianceMessage(" " + ChatColor.GRAY + getAlliance() + "s " + ChatColor.DARK_GRAY + "" + CommonSymbol.BLACK_FLAG + " " + getDeity().getColor() + name + ChatColor.GRAY + ": " + ChatColor.RESET + message);
-		Messages.info("[" + getAlliance() + "]" + name + ": " + message);
+		MessageUtil.info("[" + getAlliance() + "]" + name + ": " + message);
 	}
 
 	public void applyToPlayer(final Player player)
@@ -737,7 +737,7 @@ public class StoaCharacter extends DataAccess<UUID, StoaCharacter> implements Pa
 		character.save();
 
 		// Log the creation
-		Messages.info(English.LOG_CHARACTER_CREATED.getLine().replace("{character}", charName).replace("{id}", character.getId().toString()).replace("{deity}", deity.getName()));
+		MessageUtil.info(English.LOG_CHARACTER_CREATED.getLine().replace("{character}", charName).replace("{id}", character.getId().toString()).replace("{deity}", deity.getName()));
 
 		return character;
 	}

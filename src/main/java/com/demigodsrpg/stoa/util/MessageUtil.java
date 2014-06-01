@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 /**
  * Module to handle all common messages sent to players or the console.
  */
-public class Messages
+public class MessageUtil
 {
 	private static final Logger LOGGER;
 	private static final String PLUGIN_NAME;
@@ -215,7 +215,7 @@ public class Messages
 	public static void sendDebug(String message)
 	{
 		// Log to console
-		if(consoleDebugEnabled()) Messages.info("[Debug] " + ChatColor.stripColor(message));
+		if(consoleDebugEnabled()) MessageUtil.info("[Debug] " + ChatColor.stripColor(message));
 
 		// Log to online, debugging admins
 		for(Player player : getOnlineAdmins())
@@ -242,6 +242,6 @@ public class Messages
 	 */
 	public static boolean consoleDebugEnabled()
 	{
-		return Configs.getSettingBoolean("misc.console_debug");
+		return StoaPlugin.getInst().getConfig().getBoolean("misc.console_debug");
 	}
 }

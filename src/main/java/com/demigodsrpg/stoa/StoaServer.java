@@ -19,13 +19,14 @@ import com.demigodsrpg.stoa.mythos.Mythos;
 import com.demigodsrpg.stoa.mythos.MythosSet;
 import com.demigodsrpg.stoa.structure.StoaStructureType;
 import com.demigodsrpg.stoa.util.Configs;
-import com.demigodsrpg.stoa.util.Messages;
-import com.demigodsrpg.stoa.util.Zones;
+import com.demigodsrpg.stoa.util.MessageUtil;
+import com.demigodsrpg.stoa.util.ZoneUtil;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -57,6 +58,11 @@ public class StoaServer
 	// Load everything else.
 	protected boolean init()
 	{
+		// Config
+		Configuration config = StoaPlugin.getInst().getConfig();
+		config.options().copyDefaults(true);
+		StoaPlugin.getInst().saveConfig();
+
 		try
 		{
 			Class.forName("org.postgresql.Driver");
@@ -96,23 +102,23 @@ public class StoaServer
 		{
 			if(getMythos() == null)
 			{
-				Messages.severe("Demigods was unable to load a Mythos.");
-				Messages.severe("Please install a Mythos plugin or place the default Demigods-Greek.jar into the plugins\\Demigods\\addons directory.");
+				MessageUtil.severe("Demigods was unable to load a Mythos.");
+				MessageUtil.severe("Please install a Mythos plugin or place the default Demigods-Greek.jar into the plugins\\Demigods\\addons directory.");
 				return false;
 			}
 
 			if(!StoaPlugin.getInst().getServer().getOnlineMode())
 			{
-				Messages.warning("We depend on Mojang's auth servers for player id.");
-				Messages.warning("Players who are not premium may be kicked from the game.");
+				MessageUtil.warning("We depend on Mojang's auth servers for player id.");
+				MessageUtil.warning("Players who are not premium may be kicked from the game.");
 			}
 
 			// Check for world load errors
 			if(loadWorlds() > 0)
 			{
-				Messages.warning("Demigods was unable to confirm any worlds.");
-				Messages.warning("This may be caused by misspelled world names.");
-				Messages.warning("Multi-world plugins can cause this message, and in that case this may be a false alarm.");
+				MessageUtil.warning("Demigods was unable to confirm any worlds.");
+				MessageUtil.warning("This may be caused by misspelled world names.");
+				MessageUtil.warning("Multi-world plugins can cause this message, and in that case this may be a false alarm.");
 			}
 
 			// Load the data
@@ -140,9 +146,9 @@ public class StoaServer
 
 			if(isRunningSpigot())
 			{
-				Messages.info(("Spigot found, extra API features enabled."));
+				MessageUtil.info(("Spigot found, extra API features enabled."));
 			}
-			else Messages.warning(("Without Spigot, some features may not work."));
+			else MessageUtil.warning(("Without Spigot, some features may not work."));
 
 			// Clean skills
 			for(CharacterController character : CharacterController.all())
@@ -179,9 +185,9 @@ public class StoaServer
 			{
 				Mythos mythos = mythosProvider.getProvider();
 				workingSet.add(mythos);
-				Messages.info("The " + mythos.getTitle() + " Mythos has enabled!");
-				Messages.info("-> Created by " + mythos.getAuthor() + ".");
-				Messages.info("-> " + mythos.getTagline());
+				MessageUtil.info("The " + mythos.getTitle() + " Mythos has enabled!");
+				MessageUtil.info("-> Created by " + mythos.getAuthor() + ".");
+				MessageUtil.info("-> " + mythos.getTagline());
 				if(!mythosProvider.getProvider().isPrimary()) continue;
 				if(mythosProvider.getPriority().ordinal() < reiningPriority) // not really sure how Bukkit handles priority, presuming the same way as EventPriority
 				{
@@ -203,7 +209,7 @@ public class StoaServer
 
 	protected int loadWorlds()
 	{
-		return Zones.init();
+		return ZoneUtil.init();
 	}
 
 	protected void loadListeners()

@@ -20,8 +20,8 @@ import com.demigodsrpg.stoa.event.BattleDeathEvent;
 import com.demigodsrpg.stoa.language.English;
 import com.demigodsrpg.stoa.location.StoaLocation;
 import com.demigodsrpg.stoa.util.Configs;
-import com.demigodsrpg.stoa.util.Messages;
-import com.demigodsrpg.stoa.util.Zones;
+import com.demigodsrpg.stoa.util.MessageUtil;
+import com.demigodsrpg.stoa.util.ZoneUtil;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.*;
@@ -392,14 +392,14 @@ public class Battle extends DataAccess<UUID, Battle>
 			{
 				StoaCharacter one = StoaCharacter.get(participants.get(0));
 				StoaCharacter two = StoaCharacter.get(participants.get(1));
-				Messages.broadcast(one.getDeity().getColor() + one.getName() + ChatColor.GRAY + " and " + two.getDeity().getColor() + two.getName() + ChatColor.GRAY + " just tied in a duel.");
+				MessageUtil.broadcast(one.getDeity().getColor() + one.getName() + ChatColor.GRAY + " and " + two.getDeity().getColor() + two.getName() + ChatColor.GRAY + " just tied in a duel.");
 			}
 			else
 			{
 				int winnerIndex = scores.get(participants.get(0)) > scores.get(participants.get(1)) ? 0 : 1;
 				StoaCharacter winner = StoaCharacter.get(participants.get(winnerIndex));
 				StoaCharacter loser = StoaCharacter.get(participants.get(winnerIndex == 0 ? 1 : 0));
-				Messages.broadcast(winner.getDeity().getColor() + winner.getName() + ChatColor.GRAY + " just won in a duel against " + loser.getDeity().getColor() + loser.getName() + ChatColor.GRAY + ".");
+				MessageUtil.broadcast(winner.getDeity().getColor() + winner.getName() + ChatColor.GRAY + " just won in a duel against " + loser.getDeity().getColor() + loser.getName() + ChatColor.GRAY + ".");
 			}
 		}
 		else if(participants.size() > 2)
@@ -419,10 +419,10 @@ public class Battle extends DataAccess<UUID, Battle>
 			}
 			if(winningAlliance != null)
 			{
-				Messages.broadcast(ChatColor.GRAY + "The " + ChatColor.YELLOW + winningAlliance.getName() + "s " + ChatColor.GRAY + "just won a battle involving " + involvedPlayers.size() + " participants.");
-				Messages.broadcast(ChatColor.GRAY + "The " + ChatColor.YELLOW + "MVP" + (oneMVP ? "" : "s") + ChatColor.GRAY + " from this battle " + (oneMVP ? "is" : "are") + ":");
+				MessageUtil.broadcast(ChatColor.GRAY + "The " + ChatColor.YELLOW + winningAlliance.getName() + "s " + ChatColor.GRAY + "just won a battle involving " + involvedPlayers.size() + " participants.");
+				MessageUtil.broadcast(ChatColor.GRAY + "The " + ChatColor.YELLOW + "MVP" + (oneMVP ? "" : "s") + ChatColor.GRAY + " from this battle " + (oneMVP ? "is" : "are") + ":");
 				for(StoaCharacter mvp : MVPs)
-					Messages.broadcast(" " + ChatColor.DARK_GRAY + CommonSymbol.RIGHTWARD_ARROW + " " + mvp.getDeity().getColor() + mvp.getName() + ChatColor.GRAY + " / " + ChatColor.YELLOW + "Kills" + ChatColor.GRAY + ": " + getKills(mvp) + " / " + ChatColor.YELLOW + "Deaths" + ChatColor.GRAY + ": " + getDeaths(mvp));
+					MessageUtil.broadcast(" " + ChatColor.DARK_GRAY + CommonSymbol.RIGHTWARD_ARROW + " " + mvp.getDeity().getColor() + mvp.getName() + ChatColor.GRAY + " / " + ChatColor.YELLOW + "Kills" + ChatColor.GRAY + ": " + getKills(mvp) + " / " + ChatColor.YELLOW + "Deaths" + ChatColor.GRAY + ": " + getDeaths(mvp));
 			}
 		}
 
@@ -508,7 +508,7 @@ public class Battle extends DataAccess<UUID, Battle>
 		battle.save();
 
 		// Log the creation
-		Messages.info(English.LOG_BATTLE_STARTED.getLine().replace("{locX}", battle.getStartLocation().getX() + "").replace("{locY}", battle.getStartLocation().getY() + "").replace("{locZ}", battle.getStartLocation().getZ() + "").replace("{world}", battle.getStartLocation().getWorld().getName()).replace("{starter}", battle.getStarter().getName()));
+		MessageUtil.info(English.LOG_BATTLE_STARTED.getLine().replace("{locX}", battle.getStartLocation().getX() + "").replace("{locY}", battle.getStartLocation().getY() + "").replace("{locZ}", battle.getStartLocation().getZ() + "").replace("{world}", battle.getStartLocation().getWorld().getName()).replace("{starter}", battle.getStarter().getName()));
 
 		return battle;
 	}
@@ -751,7 +751,7 @@ public class Battle extends DataAccess<UUID, Battle>
 	 */
 	public static boolean canTarget(Participant participant) // TODO REDO THIS
 	{
-		return participant == null || participant.canPvp() || participant.getCurrentLocation() != null && !Zones.inNoPvpZone(participant.getCurrentLocation());
+		return participant == null || participant.canPvp() || participant.getCurrentLocation() != null && !ZoneUtil.inNoPvpZone(participant.getCurrentLocation());
 	}
 
 	/**

@@ -13,8 +13,8 @@ import com.demigodsrpg.stoa.entity.player.StoaPlayer;
 import com.demigodsrpg.stoa.entity.player.attribute.Notification;
 import com.demigodsrpg.stoa.structure.StoaStructureType;
 import com.demigodsrpg.stoa.util.Configs;
-import com.demigodsrpg.stoa.util.Messages;
-import com.demigodsrpg.stoa.util.Zones;
+import com.demigodsrpg.stoa.util.MessageUtil;
+import com.demigodsrpg.stoa.util.ZoneUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -36,7 +36,7 @@ public class TaskManager
 				// Update online players
 				for(Player player : Bukkit.getOnlinePlayers())
 				{
-					if(Zones.inNoStoaZone(player.getLocation())) continue;
+					if(ZoneUtil.inNoStoaZone(player.getLocation())) continue;
 					StoaPlayer.of(player).updateCanPvp();
 				}
 
@@ -71,7 +71,7 @@ public class TaskManager
 				DataManager.saveAllData();
 
 				// Send the save message to the console
-				if(SAVE_ALERT) Messages.info(Bukkit.getOnlinePlayers().length + " of " + Stoa.getServer().getAllPlayers().size() + " total players saved in " + Times.getSeconds(time) + " seconds.");
+				if(SAVE_ALERT) MessageUtil.info(Bukkit.getOnlinePlayers().length + " of " + Stoa.getServer().getAllPlayers().size() + " total players saved in " + Times.getSeconds(time) + " seconds.");
 			}
 		};
 		FAVOR = new BukkitRunnable()
@@ -94,15 +94,15 @@ public class TaskManager
 
 		// Start sync demigods runnable
 		scheduler.scheduleSyncRepeatingTask(StoaPlugin.getInst(), SYNC, 20, 20);
-		Messages.sendDebug("Main Demigods SYNC runnable enabled...");
+		MessageUtil.sendDebug("Main Demigods SYNC runnable enabled...");
 
 		// Start async demigods runnable
 		scheduler.scheduleAsyncRepeatingTask(StoaPlugin.getInst(), ASYNC, 20, 20);
-		Messages.sendDebug("Main Demigods ASYNC runnable enabled...");
+		MessageUtil.sendDebug("Main Demigods ASYNC runnable enabled...");
 
 		// Start favor runnable
 		scheduler.scheduleAsyncRepeatingTask(StoaPlugin.getInst(), FAVOR, 20, (Configs.getSettingInt("regeneration_rates.favor") * 20));
-		Messages.sendDebug("Favor regeneration runnable enabled...");
+		MessageUtil.sendDebug("Favor regeneration runnable enabled...");
 
 		// Start saving runnable TODO Should we move this?
 		scheduler.scheduleAsyncRepeatingTask(StoaPlugin.getInst(), SAVE, 20, (Configs.getSettingInt("saving.freq") * 20));

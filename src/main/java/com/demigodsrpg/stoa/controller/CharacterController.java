@@ -21,7 +21,7 @@ import com.demigodsrpg.stoa.model.PlayerModel;
 import com.demigodsrpg.stoa.structure.StoaStructure;
 import com.demigodsrpg.stoa.structure.StoaStructureType;
 import com.demigodsrpg.stoa.util.Configs;
-import com.demigodsrpg.stoa.util.Messages;
+import com.demigodsrpg.stoa.util.MessageUtil;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -325,7 +325,7 @@ public class CharacterController extends Controller<CharacterModel> implements P
 	public CharacterController chatWithAlliance(String message)
 	{
 		sendAllianceMessage(" " + ChatColor.GRAY + getAlliance() + "s " + ChatColor.DARK_GRAY + "" + CommonSymbol.BLACK_FLAG + " " + getDeity().getColor() + model.name + ChatColor.GRAY + ": " + ChatColor.RESET + message);
-		Messages.info("[" + getAlliance() + "]" + model.name + ": " + message);
+		MessageUtil.info("[" + getAlliance() + "]" + model.name + ": " + message);
 		return this;
 	}
 
