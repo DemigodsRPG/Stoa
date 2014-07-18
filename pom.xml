@@ -29,14 +29,22 @@
     <properties> <!-- It is important to keep up to date manually. -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <censoredlib.version>1.0.0-SNAPSHOT</censoredlib.version>
-        <spigot.version>1.7.9-R0.2-SNAPSHOT</spigot.version>
-        <minecraft_version>1_7_R3</minecraft_version>
+        <spigot.version>1.7.10-R0.1-SNAPSHOT</spigot.version>
+        <minecraft_version>1_7_R4</minecraft_version>
     </properties>
 
     <repositories>
         <repository>
+            <id>md_5 repo</id>
+            <url>http://repo.md-5.net/content/repositories/snapshots</url>
+        </repository>
+        <repository>
             <id>censored-software</id>
             <url>http://repo.censoredsoftware.com</url>
+        </repository>
+        <repository>
+            <id>iciql-repo</id>
+            <url>https://github.com/gitblit/iciql-maven/raw/master</url>
         </repository>
     </repositories>
 
@@ -44,10 +52,8 @@
         <!-- Spigot -->
         <dependency>
             <groupId>org.spigotmc</groupId>
-            <artifactId>quasi-spigot</artifactId>
+            <artifactId>spigot-api</artifactId>
             <version>${spigot.version}</version>
-            <type>jar</type>
-            <scope>compile</scope>
         </dependency>
 
         <!-- CensoredLib -->
@@ -63,36 +69,15 @@
         </dependency>
         <dependency>
             <groupId>com.censoredsoftware.library</groupId>
-            <artifactId>data</artifactId>
-            <version>${censoredlib.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.censoredsoftware.library</groupId>
-            <artifactId>mc-id-provider</artifactId>
-            <version>${censoredlib.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.censoredsoftware.library</groupId>
-            <artifactId>messages</artifactId>
-            <version>${censoredlib.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.censoredsoftware.library</groupId>
-            <artifactId>schematic</artifactId>
-            <version>${censoredlib.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.censoredsoftware.library</groupId>
             <artifactId>util</artifactId>
             <version>${censoredlib.version}</version>
         </dependency>
 
-        <!-- javatuples -->
+        <!-- iciql -->
         <dependency>
-            <groupId>org.javatuples</groupId>
-            <artifactId>javatuples</artifactId>
-            <version>1.2</version>
-            <scope>compile</scope>
+            <groupId>com.iciql</groupId>
+            <artifactId>iciql</artifactId>
+            <version>1.2.0</version>
         </dependency>
 
         <!-- postgre -->
@@ -129,17 +114,32 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <minimizeJar>true</minimizeJar>
+                            <filters>
+                                <filter>
+                                    <artifact>postgresql:postgresql</artifact>
+                                    <includes>
+                                        <include>**</include>
+                                    </includes>
+                                </filter>
+                            </filters>
                             <artifactSet>
                                 <includes>
                                     <include>com.censoredsoftware.library:*</include>
                                     <include>org.javatuples:javatuples</include>
+                                    <include>com.iciql:iciql</include>
                                     <include>postgresql:postgresql</include>
                                 </includes>
                             </artifactSet>
                             <relocations>
                                 <relocation>
                                     <pattern>org.javatuples</pattern>
-                                    <shadedPattern>com.censoredsoftware.stoa.org.javatuples</shadedPattern>
+                                    <shadedPattern>com.demigodsrpg.stoa.shaded.org.javatuples</shadedPattern>
+                                </relocation>
+
+                                <relocation>
+                                    <pattern>com.iciql</pattern>
+                                    <shadedPattern>com.demigodsrpg.stoa.shaded.com.iciql</shadedPattern>
                                 </relocation>
 
                                 <!-- Redo the damage for compatibility -->
