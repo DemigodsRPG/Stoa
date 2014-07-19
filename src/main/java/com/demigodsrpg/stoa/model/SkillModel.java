@@ -5,6 +5,7 @@ import com.iciql.Iciql;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 
+@Iciql.IQTable(name = "dg_skills")
 public class SkillModel {
     @Iciql.IQColumn
     public String id;
