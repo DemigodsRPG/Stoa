@@ -1,7 +1,5 @@
 package com.demigodsrpg.stoa;
 
-import com.demigodsrpg.stoa.controller.CharacterController;
-import com.demigodsrpg.stoa.controller.PlayerController;
 import com.demigodsrpg.stoa.data.TaskManager;
 import com.demigodsrpg.stoa.deity.Ability;
 import com.demigodsrpg.stoa.deity.Alliance;
@@ -9,12 +7,12 @@ import com.demigodsrpg.stoa.deity.Deity;
 import com.demigodsrpg.stoa.entity.player.attribute.Skill;
 import com.demigodsrpg.stoa.item.DivineItem;
 import com.demigodsrpg.stoa.model.CharacterModel;
-import com.demigodsrpg.stoa.model.NotificationModel;
 import com.demigodsrpg.stoa.model.PlayerModel;
+import com.demigodsrpg.stoa.model.StructureModel;
 import com.demigodsrpg.stoa.mythos.Mythos;
 import com.demigodsrpg.stoa.mythos.MythosSet;
-import com.demigodsrpg.stoa.util.MessageUtil;
-import com.demigodsrpg.stoa.util.ZoneUtil;
+import com.demigodsrpg.stoa.util.*;
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
@@ -60,19 +58,6 @@ public class StoaServer {
             e.printStackTrace();
         }
 
-        try {
-            Db db = Db.open("jdbc:postgresql://localhost:5432/minecraft", "minecraft", "minecraft");
-
-            db.from(new PlayerModel()).select();
-            db.from(new CharacterModel()).select();
-            db.from(new NotificationModel()).select();
-
-            db.close();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return false;
-        }
-
         // Initialize metrics
         try {
             (new MetricsLite(StoaPlugin.getInst())).start();
@@ -99,15 +84,12 @@ public class StoaServer {
                 MessageUtil.warning("Multi-world plugins can cause this message, and in that case this may be a false alarm.");
             }
 
-            // Load the data
-            DataManager.initAllData();
-
             // Load listeners, commands, permissions, and the scoreboard
             loadListeners();
             loadPermissions(true);
 
             // Update characters
-            CharacterController.updateUsableCharacters();
+            CharacterUtil.updateUsableCharacters();
 
             // Start threads
             TaskManager.startThreads();
@@ -116,7 +98,7 @@ public class StoaServer {
             Bukkit.getScheduler().scheduleSyncDelayedTask(StoaPlugin.getInst(), new BukkitRunnable() {
                 @Override
                 public void run() {
-                    StoaStructureModel.Type.Util.regenerateStructures();
+                    StructureUtil.regenerateStructures();
                 }
             }, 120);
 
@@ -125,8 +107,7 @@ public class StoaServer {
             } else MessageUtil.warning(("Without Spigot, some features may not work."));
 
             // Clean skills
-            for (CharacterController character : CharacterController.all())
-                character.cleanSkills();
+            SkillUtil.cleanSkills();
 
             return true;
         } catch (Exception errored) {
@@ -190,9 +171,9 @@ public class StoaServer {
             if (ability.getListener() != null) register.registerEvents(ability.getListener(), StoaPlugin.getInst());
 
         // Structures
-        for (StoaStructureModel.Type structureType : Collections2.filter(getMythos().getStructures(), new Predicate<StoaStructureModel.Type>() {
+        for (StructureModel.Type structureType : Collections2.filter(getMythos().getStructures(), new Predicate<StructureModel.Type>() {
             @Override
-            public boolean apply(StoaStructureModel.Type structureType) {
+            public boolean apply(StructureModel.Type structureType) {
                 return structureType.getListener() != null;
             }
         }))
@@ -248,11 +229,6 @@ public class StoaServer {
     }
 
     void uninit() {
-        if (StoaPlugin.getReady()) {
-            // Save all the data.
-            DataManager.saveAllData();
-        }
-
         // Cancel all threads, event calls, and unregister permissions.
         try {
             TaskManager.stopThreads();
@@ -284,45 +260,63 @@ public class StoaServer {
 
     // -- PLAYER -- //
 
-    public Collection<PlayerController> getAllPlayers() {
-        return PlayerController.all();
+    public List<PlayerModel> getAllPlayers() {
+        PlayerModel alias = new PlayerModel();
+        Db db = openDb();
+        try {
+            return db.from(alias).select();
+        } finally {
+            db.close();
+        }
     }
 
-    public Collection<PlayerController> getOnlinePlayers() {
-        return Collections2.filter(PlayerController.all(), new Predicate<PlayerController>() {
+    public Collection<PlayerModel> getOnlinePlayers() {
+        return Collections2.transform(Bukkit.getOnlinePlayers(), new Function<Player, PlayerModel>() {
             @Override
-            public boolean apply(PlayerController player) {
-                return player.getEntity() != null;
+            public PlayerModel apply(Player player) {
+                return PlayerUtil.fromPlayer(player);
             }
         });
     }
 
     // -- MORTAL -- //
 
-    public Collection<PlayerController> getMortals() {
-        return Collections2.transform(Collections2.filter(PlayerController.all(), new Predicate<PlayerController>() {
-            @Override
-            public boolean apply(PlayerController player) {
-                CharacterController character = player.getCharacter();
-                return character == null || !character.getModel().usable || !character.getModel().active;
-            }
-        }));
+    public Collection<PlayerModel> getMortals() {
+        PlayerModel alias = new PlayerModel();
+        Db db = openDb();
+        try {
+            return Collections2.filter(db.from(alias).select(), new Predicate<PlayerModel>() {
+                @Override
+                public boolean apply(PlayerModel player) {
+                    CharacterModel character = player.getCharacter();
+                    return character == null || !character.usable || !character.active;
+                }
+            });
+        } finally {
+            db.close();
+        }
     }
 
-    public Set<Player> getOnlineMortals() {
-        return Sets.filter(Sets.newHashSet(Bukkit.getOnlinePlayers()), new Predicate<Player>() {
-            @Override
-            public boolean apply(Player player) {
-                CharacterController character = CharacterController.currentFromPlayer(player);
-                return character == null || !character.getModel().usable || !character.getModel().active;
-            }
-        });
+    public Collection<PlayerModel> getOnlineMortals() {
+        PlayerModel alias = new PlayerModel();
+        Db db = openDb();
+        try {
+            return Collections2.filter(db.from(alias).select(), new Predicate<PlayerModel>() {
+                @Override
+                public boolean apply(PlayerModel player) {
+                    CharacterModel character = player.getCharacter();
+                    return player.getOfflinePlayer().isOnline() && (character == null || !character.usable || !character.active);
+                }
+            });
+        } finally {
+            db.close();
+        }
     }
 
     // -- CHARACTER -- //
 
-    public CharacterController getCharacter(String name) {
-        return CharacterController.fromName(name);
+    public CharacterModel getCharacter(String name) {
+        return CharacterUtil.fromName(name);
     }
 
     public Collection<CharacterModel> getActiveCharacters() {
@@ -341,23 +335,22 @@ public class StoaServer {
         return found;
     }
 
-    public Collection<CharacterController> getOnlineCharacters() {
-        List<CharacterController> onlineCharacters = new ArrayList<>();
+    public Collection<CharacterModel> getOnlineCharacters() {
+        List<CharacterModel> onlineCharacters = new ArrayList<>();
         for (Player player : Bukkit.getOnlinePlayers()) {
-            CharacterController online = CharacterController.currentFromPlayer(player);
+            CharacterModel online = CharacterUtil.currentFromPlayer(player);
             if (online != null) onlineCharacters.add(online);
         }
         return onlineCharacters;
     }
 
-    // -- WORLD -- //
-
-    public StoaWorld getWorld(String name) {
-        return WorldDataManager.getWorld(name);
-    }
-
-    public Collection<StoaWorld> getWorlds() {
-        return WorldDataManager.getWorlds();
+    public Collection<CharacterModel> getOnlineCharactersWithAlliance(Alliance alliance) {
+        List<CharacterModel> onlineCharacters = new ArrayList<>();
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            CharacterModel online = CharacterUtil.currentFromPlayer(player);
+            if (online != null && online.getAlliance().equals(alliance)) onlineCharacters.add(online);
+        }
+        return onlineCharacters;
     }
 
     public static Db openDb() {

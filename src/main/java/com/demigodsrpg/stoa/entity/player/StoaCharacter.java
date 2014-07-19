@@ -22,7 +22,7 @@ import com.demigodsrpg.stoa.inventory.StoaEnderInventory;
 import com.demigodsrpg.stoa.inventory.StoaPlayerInventory;
 import com.demigodsrpg.stoa.language.English;
 import com.demigodsrpg.stoa.location.StoaLocation;
-import com.demigodsrpg.stoa.model.StoaStructureModel;
+import com.demigodsrpg.stoa.model.StructureModel;
 import com.demigodsrpg.stoa.util.Configs;
 import com.demigodsrpg.stoa.util.MessageUtil;
 import com.google.common.base.Function;
@@ -425,19 +425,19 @@ public class StoaCharacter extends DataAccess<UUID, StoaCharacter> implements Pa
         });
     }
 
-    public Collection<StoaStructureModel> getOwnedStructures() {
-        return StoaStructureModel.find(new Predicate<StoaStructureModel>() {
+    public Collection<StructureModel> getOwnedStructures() {
+        return StructureModel.find(new Predicate<StructureModel>() {
             @Override
-            public boolean apply(StoaStructureModel data) {
+            public boolean apply(StructureModel data) {
                 return data.getOwner().equals(getId());
             }
         });
     }
 
-    public Collection<StoaStructureModel> getOwnedStructures(final String type) {
-        return StoaStructureModel.find(new Predicate<StoaStructureModel>() {
+    public Collection<StructureModel> getOwnedStructures(final String type) {
+        return StructureModel.find(new Predicate<StructureModel>() {
             @Override
-            public boolean apply(StoaStructureModel data) {
+            public boolean apply(StructureModel data) {
                 return data.getTypeName().equals(type) && data.getOwner().equals(getId());
             }
         });
@@ -491,7 +491,7 @@ public class StoaCharacter extends DataAccess<UUID, StoaCharacter> implements Pa
         // Remove the data
         if (stoaPlayer.getCharacter() != null && stoaPlayer.getCharacter().getName().equalsIgnoreCase(getName()))
             stoaPlayer.resetCurrent();
-        for (StoaStructureModel structure : StoaStructureModel.Type.Util.getStructuresWithFlag(StoaStructureModel.Type.Flag.DELETE_WITH_OWNER))
+        for (StructureModel structure : StructureModel.Type.Util.getStructuresWithFlag(StructureModel.Type.Flag.DELETE_WITH_OWNER))
             if (structure.hasOwner() && structure.getOwner().equals(getId())) structure.remove();
         for (StoaPotionEffect potion : getRawPotionEffects())
             potion.remove();

@@ -3,7 +3,7 @@ package com.demigodsrpg.stoa.util;
 import com.demigodsrpg.stoa.Stoa;
 import com.demigodsrpg.stoa.StoaServer;
 import com.demigodsrpg.stoa.location.StoaRegion;
-import com.demigodsrpg.stoa.model.StoaStructureModel;
+import com.demigodsrpg.stoa.model.StructureModel;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
@@ -19,11 +19,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class StructureUtil {
-    public static StoaStructureModel getStructure(final Location location) {
+    public static StructureModel getStructure(final Location location) {
         return getStructureFromBlock(location.getBlock());
     }
 
-    public static StoaStructureModel getStructureFromBlock(final Block block) {
+    public static StructureModel getStructureFromBlock(final Block block) {
         // Check the meta
         if (block.hasMetadata("stoa.structure")) {
             // Get the center block
@@ -38,13 +38,13 @@ public class StructureUtil {
 
             // Does the type exist?
             if (typeExists(typeName)) {
-                StoaStructureModel.Type type = Stoa.getMythos().getStructure(typeName);
+                StructureModel.Type type = Stoa.getMythos().getStructure(typeName);
 
                 // Does the design exist?
                 if (designExists(type, designName)) {
                     // Get the rest of the data
-                    StoaStructureModel.Design design = type.getDesign(designName);
-                    return new StoaStructureModel(ownerId, center, type, design);
+                    StructureModel.Design design = type.getDesign(designName);
+                    return new StructureModel(ownerId, center, type, design);
                 }
             }
         }
@@ -77,20 +77,20 @@ public class StructureUtil {
         return Stoa.getMythos().getStructure(typeName) != null;
     }
 
-    public static boolean designExists(StoaStructureModel.Type type, String designName) {
+    public static boolean designExists(StructureModel.Type type, String designName) {
         return type.getDesign(designName) != null;
     }
 
-    public static Set<StoaStructureModel> getStructuresInRegionalArea(Location location) {
+    public static Set<StructureModel> getStructuresInRegionalArea(Location location) {
         final StoaRegion center = StoaRegion.at(location);
-        Set<StoaStructureModel> set = new HashSet<>();
+        Set<StructureModel> set = new HashSet<>();
         for (StoaRegion region : center.getSurroundingRegions())
             set.addAll(getStructuresInSingleRegion(region));
         return set;
     }
 
-    public static Collection<StoaStructureModel> getStructuresInSingleRegion(StoaRegion region) {
-        StoaStructureModel alias = new StoaStructureModel();
+    public static Collection<StructureModel> getStructuresInSingleRegion(StoaRegion region) {
+        StructureModel alias = new StructureModel();
         Db db = StoaServer.openDb();
         try {
             return db.from(alias).
@@ -108,29 +108,29 @@ public class StructureUtil {
     }
 
     public static boolean partOfStructureWithType(final Location location, final String type) {
-        return Iterables.any(getStructuresInRegionalArea(location), new Predicate<StoaStructureModel>() {
+        return Iterables.any(getStructuresInRegionalArea(location), new Predicate<StructureModel>() {
             @Override
-            public boolean apply(StoaStructureModel save) {
+            public boolean apply(StructureModel save) {
                 return save.typeName.equals(type) && save.getLocations().contains(location);
             }
         });
     }
 
-    public static boolean partOfStructureWithAllFlags(final Location location, final StoaStructureModel.Flag... flags) {
-        return Iterables.any(getStructuresInRegionalArea(location), new Predicate<StoaStructureModel>() {
+    public static boolean partOfStructureWithAllFlags(final Location location, final StructureModel.Flag... flags) {
+        return Iterables.any(getStructuresInRegionalArea(location), new Predicate<StructureModel>() {
             @Override
-            public boolean apply(StoaStructureModel save) {
+            public boolean apply(StructureModel save) {
                 return save.getLocations().contains(location) && save.getFlags().containsAll(Arrays.asList(flags));
             }
         });
     }
 
-    public static boolean partOfStructureWithFlag(final Location location, final StoaStructureModel.Flag... flags) {
-        return Iterables.any(getStructuresInRegionalArea(location), new Predicate<StoaStructureModel>() {
+    public static boolean partOfStructureWithFlag(final Location location, final StructureModel.Flag... flags) {
+        return Iterables.any(getStructuresInRegionalArea(location), new Predicate<StructureModel>() {
             @Override
-            public boolean apply(StoaStructureModel save) {
+            public boolean apply(StructureModel save) {
                 if (save.getLocations().contains(location)) {
-                    for (StoaStructureModel.Flag flag : flags) {
+                    for (StructureModel.Flag flag : flags) {
                         if (save.getFlags().contains(flag)) {
                             return true;
                         }
@@ -141,50 +141,50 @@ public class StructureUtil {
         });
     }
 
-    public static boolean partOfStructureWithFlag(final Location location, final StoaStructureModel.Flag flag) {
-        return Iterables.any(getStructuresInRegionalArea(location), new Predicate<StoaStructureModel>() {
+    public static boolean partOfStructureWithFlag(final Location location, final StructureModel.Flag flag) {
+        return Iterables.any(getStructuresInRegionalArea(location), new Predicate<StructureModel>() {
             @Override
-            public boolean apply(StoaStructureModel save) {
+            public boolean apply(StructureModel save) {
                 return save.getLocations().contains(location) && save.getFlags().contains(flag);
             }
         });
     }
 
-    public static boolean isClickableBlockWithFlag(final Location location, final StoaStructureModel.Flag flag) {
-        return Iterables.any(getStructuresInRegionalArea(location), new Predicate<StoaStructureModel>() {
+    public static boolean isClickableBlockWithFlag(final Location location, final StructureModel.Flag flag) {
+        return Iterables.any(getStructuresInRegionalArea(location), new Predicate<StructureModel>() {
             @Override
-            public boolean apply(StoaStructureModel save) {
+            public boolean apply(StructureModel save) {
                 return save.getFlags().contains(flag) && save.getClickable().contains(location);
             }
         });
     }
 
-    public static boolean isInRadiusWithFlag(Location location, StoaStructureModel.Flag flag) {
+    public static boolean isInRadiusWithFlag(Location location, StructureModel.Flag flag) {
         return !getInRadiusWithFlag(location, flag).isEmpty();
     }
 
-    public static Collection<StoaStructureModel> getInRadiusWithFlag(final Location location, final StoaStructureModel.Flag... flags) {
-        return Collections2.filter(getStructuresInRegionalArea(location), new Predicate<StoaStructureModel>() {
+    public static Collection<StructureModel> getInRadiusWithFlag(final Location location, final StructureModel.Flag... flags) {
+        return Collections2.filter(getStructuresInRegionalArea(location), new Predicate<StructureModel>() {
             @Override
-            public boolean apply(StoaStructureModel save) {
+            public boolean apply(StructureModel save) {
                 return save.getCenter().getWorld().equals(location.getWorld()) && save.getCenter().getLocation().distance(location) <= save.getType().getRadius() && save.getFlags().containsAll(Arrays.asList(flags));
             }
         });
     }
 
-    public static Collection<StoaStructureModel> getInRadiusWithFlag(final Location location, final StoaStructureModel.Flag flag) {
-        return Collections2.filter(getStructuresInRegionalArea(location), new Predicate<StoaStructureModel>() {
+    public static Collection<StructureModel> getInRadiusWithFlag(final Location location, final StructureModel.Flag flag) {
+        return Collections2.filter(getStructuresInRegionalArea(location), new Predicate<StructureModel>() {
             @Override
-            public boolean apply(StoaStructureModel save) {
+            public boolean apply(StructureModel save) {
                 return save.getCenter().getWorld().equals(location.getWorld()) && save.getCenter().getLocation().distance(location) <= save.getType().getRadius() && save.getFlags().contains(flag);
             }
         });
     }
 
-    public static StoaStructureModel closestInRadiusWithFlag(final Location location, final StoaStructureModel.Flag flag) {
-        StoaStructureModel found = null;
+    public static StructureModel closestInRadiusWithFlag(final Location location, final StructureModel.Flag flag) {
+        StructureModel found = null;
         double nearestDistance = Double.MAX_VALUE;
-        for (StoaStructureModel save : getStructuresInRegionalArea(location)) {
+        for (StructureModel save : getStructuresInRegionalArea(location)) {
             if (save.getFlags().contains(flag)) {
                 double distance = save.getCenter().getLocation().distance(location);
                 if (distance <= save.getType().getRadius() && distance < nearestDistance) {
@@ -196,27 +196,27 @@ public class StructureUtil {
         return found;
     }
 
-    public static Collection<StoaStructureModel> getInRadiusWithFlag(final Location location, final StoaStructureModel.Flag flag, final int radius) {
-        return Collections2.filter(getStructuresInRegionalArea(location), new Predicate<StoaStructureModel>() {
+    public static Collection<StructureModel> getInRadiusWithFlag(final Location location, final StructureModel.Flag flag, final int radius) {
+        return Collections2.filter(getStructuresInRegionalArea(location), new Predicate<StructureModel>() {
             @Override
-            public boolean apply(StoaStructureModel save) {
+            public boolean apply(StructureModel save) {
                 return save.getCenter().getWorld().equals(location.getWorld()) && save.getCenter().getLocation().distance(location) <= radius && save.getFlags().contains(flag);
             }
         });
     }
 
     public static void regenerateStructures() {
-        StoaStructureModel alias = new StoaStructureModel();
+        StructureModel alias = new StructureModel();
         Db db = StoaServer.openDb();
-        for (StoaStructureModel save : db.from(alias).select()) {
+        for (StructureModel save : db.from(alias).select()) {
             save.getSchematic().generate(save.getCenter().getLocation());
         }
         db.close();
     }
 
-    public static Set<StoaStructureModel> getStructuresWithFlag(final StoaStructureModel.Flag flag) {
-        Set<StoaStructureModel> structures = Sets.newHashSet();
-        for (StoaStructureModel.Type structure : Stoa.getMythos().getStructures()) {
+    public static Set<StructureModel> getStructuresWithFlag(final StructureModel.Flag flag) {
+        Set<StructureModel> structures = Sets.newHashSet();
+        for (StructureModel.Type structure : Stoa.getMythos().getStructures()) {
             if (structure.getFlags().contains(flag)) {
                 structures.addAll(getStructuresWithType(structure.getName()));
             }
@@ -224,8 +224,8 @@ public class StructureUtil {
         return structures;
     }
 
-    public static Collection<StoaStructureModel> getStructuresWithType(final String typeName) {
-        StoaStructureModel alias = new StoaStructureModel();
+    public static Collection<StructureModel> getStructuresWithType(final String typeName) {
+        StructureModel alias = new StructureModel();
         Db db = StoaServer.openDb();
         try {
             return db.from(alias).
@@ -238,10 +238,10 @@ public class StructureUtil {
     }
 
     public static boolean noOverlapStructureNearby(Location location) {
-        return Iterables.any(getStructuresInRegionalArea(location), new Predicate<StoaStructureModel>() {
+        return Iterables.any(getStructuresInRegionalArea(location), new Predicate<StructureModel>() {
             @Override
-            public boolean apply(StoaStructureModel save) {
-                return save.getFlags().contains(StoaStructureModel.Flag.NO_OVERLAP);
+            public boolean apply(StructureModel save) {
+                return save.getFlags().contains(StructureModel.Flag.NO_OVERLAP);
             }
         });
     }
@@ -293,7 +293,7 @@ public class StructureUtil {
      * Updates favor for all structures.
      */
     public static void updateSanctity() {
-        for (StoaStructureModel data : getStructuresWithFlag(StoaStructureModel.Flag.DESTRUCT_ON_BREAK))
+        for (StructureModel data : getStructuresWithFlag(StructureModel.Flag.DESTRUCT_ON_BREAK))
             data.corrupt(-1.0 * data.getType().getSanctityRegen());
     }
 }

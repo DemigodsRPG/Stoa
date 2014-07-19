@@ -1,12 +1,16 @@
 package com.demigodsrpg.stoa.model;
 
 import com.demigodsrpg.stoa.Stoa;
+import com.demigodsrpg.stoa.StoaPlugin;
+import com.demigodsrpg.stoa.StoaServer;
 import com.demigodsrpg.stoa.entity.player.StoaCharacter;
 import com.demigodsrpg.stoa.schematic.Schematic;
 import com.demigodsrpg.stoa.util.MetaUtil;
+import com.iciql.Db;
 import com.iciql.Iciql;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -16,7 +20,7 @@ import java.util.Collection;
 import java.util.Set;
 
 @Iciql.IQTable(name = "dg_structures")
-public class StoaStructureModel {
+public class StructureModel {
     @Iciql.IQColumn(primaryKey = true, autoIncrement = true)
     public Long id;
 
@@ -38,9 +42,6 @@ public class StoaStructureModel {
     public String designName;
 
     @Iciql.IQColumn
-    public String metadataModelId;
-
-    @Iciql.IQColumn
     public Double sanctity;
     @Iciql.IQColumn
     public Double corruption;
@@ -49,14 +50,14 @@ public class StoaStructureModel {
     private transient Type type;
     private transient Design design;
 
-    public StoaStructureModel() {
+    public StructureModel() {
     }
 
-    public StoaStructureModel(StoaCharacter owner, Block center, Type type, Design design) {
+    public StructureModel(StoaCharacter owner, Block center, Type type, Design design) {
         this(owner.getId().toString(), center, type, design);
     }
 
-    public StoaStructureModel(String ownerId, Block center, Type type, Design design) {
+    public StructureModel(String ownerId, Block center, Type type, Design design) {
         this.x = center.getX();
         this.y = center.getY();
         this.z = center.getZ();
@@ -69,7 +70,7 @@ public class StoaStructureModel {
         this.design = design;
     }
 
-    public StoaStructureModel marshall() {
+    public StructureModel marshall() {
         if (id != null && Bukkit.getWorld(world) != null) {
             center = new Location(Bukkit.getWorld(world), x, y, z).getBlock();
             type = Stoa.getMythos().getStructure(typeName);
@@ -130,6 +131,14 @@ public class StoaStructureModel {
         this.center = center;
     }
 
+    public String getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
+    }
+
     public Type getType() {
         return type;
     }
@@ -178,6 +187,23 @@ public class StoaStructureModel {
         return type.kill(this, character);
     }
 
+    public void remove() {
+        for (Location location : getLocations()) {
+            Block block = location.getBlock();
+            block.setType(Material.AIR);
+            block.removeMetadata("stoa.structure.owner", StoaPlugin.getInst());
+            block.removeMetadata("stoa.structure.type", StoaPlugin.getInst());
+            block.removeMetadata("stoa.structure.design", StoaPlugin.getInst());
+            block.removeMetadata("stoa.structure.center.world", StoaPlugin.getInst());
+            block.removeMetadata("stoa.structure.center.x", StoaPlugin.getInst());
+            block.removeMetadata("stoa.structure.center.y", StoaPlugin.getInst());
+            block.removeMetadata("stoa.structure.center.z", StoaPlugin.getInst());
+        }
+        Db db = StoaServer.openDb();
+        db.delete(this);
+        db.close();
+    }
+
     public interface Type {
         String getName();
 
@@ -191,13 +217,13 @@ public class StoaStructureModel {
 
         Listener getListener();
 
-        boolean sanctify(StoaStructureModel data, StoaCharacter character);
+        boolean sanctify(StructureModel data, StoaCharacter character);
 
-        boolean corrupt(StoaStructureModel data, StoaCharacter character);
+        boolean corrupt(StructureModel data, StoaCharacter character);
 
-        boolean birth(StoaStructureModel data, StoaCharacter character);
+        boolean birth(StructureModel data, StoaCharacter character);
 
-        boolean kill(StoaStructureModel data, StoaCharacter character);
+        boolean kill(StructureModel data, StoaCharacter character);
 
         double getDefSanctity();
 
@@ -207,9 +233,9 @@ public class StoaStructureModel {
 
         int getRequiredGenerationCoords();
 
-        boolean isAllowed(@Nullable StoaStructureModel data, Player sender);
+        boolean isAllowed(@Nullable StructureModel data, Player sender);
 
-        StoaStructureModel createNew(boolean generate, @Nullable String design, Location... reference);
+        StructureModel createNew(boolean generate, @Nullable String design, Location... reference);
     }
 
     public interface Design {
@@ -217,7 +243,7 @@ public class StoaStructureModel {
 
         Set<Location> getClickable(Location reference);
 
-        Schematic getSchematic(@Nullable StoaStructureModel data);
+        Schematic getSchematic(@Nullable StructureModel data);
     }
 
     public enum Flag {

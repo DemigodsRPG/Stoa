@@ -1,6 +1,7 @@
 package com.demigodsrpg.stoa.util;
 
 import com.demigodsrpg.stoa.StoaServer;
+import com.demigodsrpg.stoa.model.CharacterModel;
 import com.demigodsrpg.stoa.model.PlayerModel;
 import com.iciql.Db;
 import net.minecraft.util.com.google.common.collect.Iterables;
@@ -54,5 +55,27 @@ public class PlayerUtil {
         } finally {
             db.close();
         }
+    }
+
+    /**
+     * Returns true if the <code>player</code> is currently immortal.
+     *
+     * @param player the player to check.
+     * @return boolean
+     */
+    public static boolean isImmortal(Player player) {
+        CharacterModel character = fromPlayer(player).getCharacter();
+        return character != null && character.getUsable() && character.getActive();
+    }
+
+    /**
+     * Returns true if <code>player</code> has a character with the name <code>charName</code>.
+     *
+     * @param player   the player to check.
+     * @param charName the charName to check with.
+     * @return boolean
+     */
+    public static boolean hasCharName(Player player, String charName) {
+        return fromPlayer(player).hasCharName(charName);
     }
 }

@@ -5,41 +5,32 @@ import com.iciql.Iciql;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.Optional;
-import java.util.UUID;
 
-@Iciql.IQTable(name = "deaths")
-public class DeathModel implements Model {
+@Iciql.IQTable(name = "dg_deaths")
+public class DeathModel {
     // -- DEFAULT CONSTRUCTOR -- //
     public DeathModel() {
     }
 
-    // -- PRACTICAL STATIC CONSTRUCTOR -- //
-    public static DeathModel from(Participant victim, Optional<Participant> killer) {
-        DeathModel model = new DeathModel();
-
+    // -- PRACTICAL CONSTRUCTOR -- //
+    public DeathModel(Participant victim) {
         // Set data and foreign keys
-        model.deathTime = Timestamp.from(Instant.now());
-        model.victimId = victim.getCharacter().id();
+        deathTime = Timestamp.from(Instant.now());
+        victimId = victim.getCharacter().getId();
+    }
 
-        // Optional data
-        if (killer.isPresent()) {
-            model.killerType = killer.get().getModel().modelName();
-            model.killerId = killer.get().getModel().id();
-        }
-
-        return model;
+    public DeathModel(Participant victim, Participant killer) {
+        this(victim);
+        killerId = killer.getCharacter().getId();
     }
 
     // -- MODEL META -- //
-    @Iciql.IQColumn(primaryKey = true)
-    public String id = UUID.randomUUID().toString();
+    @Iciql.IQColumn(primaryKey = true, autoIncrement = true)
+    public Long id;
 
     // -- DATA -- //
     @Iciql.IQColumn
     public Timestamp deathTime;
-    @Iciql.IQColumn
-    public String killerType;
 
     // -- FOREIGN DATA -- //
     @Iciql.IQColumn
@@ -47,14 +38,5 @@ public class DeathModel implements Model {
     @Iciql.IQColumn
     public String killerId;
 
-    // -- INTERFACE METHODS -- //
-    @Override
-    public String id() {
-        return id;
-    }
-
-    @Override
-    public String modelName() {
-        return "DEATH";
-    }
+    // TODO
 }

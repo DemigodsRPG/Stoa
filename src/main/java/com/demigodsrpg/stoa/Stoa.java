@@ -1,7 +1,7 @@
 package com.demigodsrpg.stoa;
 
-import com.demigodsrpg.stoa.controller.CharacterController;
-import com.demigodsrpg.stoa.controller.PlayerController;
+import com.demigodsrpg.stoa.model.CharacterModel;
+import com.demigodsrpg.stoa.model.PlayerModel;
 import com.demigodsrpg.stoa.mythos.Mythos;
 import org.bukkit.conversations.ConversationFactory;
 
@@ -37,11 +37,11 @@ public class Stoa {
 
     // -- PASS UP DATA FROM STOA SERVER CLASS -- //
 
-    public static Collection<PlayerController> getOnlinePlayers() {
+    public static Collection<PlayerModel> getOnlinePlayers() {
         return getServer().getOnlinePlayers();
     }
 
-    public static Collection<CharacterController> getOnlineCharacters() {
+    public static Collection<CharacterModel> getOnlineCharacters() {
         return getServer().getOnlineCharacters();
     }
 }

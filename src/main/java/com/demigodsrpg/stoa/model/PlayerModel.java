@@ -1,28 +1,18 @@
 package com.demigodsrpg.stoa.model;
 
-import com.censoredsoftware.library.data.ServerData;
 import com.demigodsrpg.stoa.StoaPlugin;
+import com.demigodsrpg.stoa.StoaServer;
 import com.demigodsrpg.stoa.battle.Battle;
 import com.demigodsrpg.stoa.battle.Participant;
-import com.demigodsrpg.stoa.controller.CharacterController;
 import com.demigodsrpg.stoa.entity.StoaTameable;
-import com.demigodsrpg.stoa.entity.player.StoaCharacter;
 import com.demigodsrpg.stoa.entity.player.attribute.Notification;
 import com.demigodsrpg.stoa.inventory.StoaEnderInventory;
 import com.demigodsrpg.stoa.inventory.StoaPlayerInventory;
 import com.demigodsrpg.stoa.language.English;
-import com.demigodsrpg.stoa.util.ChatRecorder;
-import com.demigodsrpg.stoa.util.MessageUtil;
-import com.demigodsrpg.stoa.util.ZoneUtil;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
+import com.demigodsrpg.stoa.util.*;
 import com.iciql.Db;
 import com.iciql.Iciql;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.PlayerInventory;
@@ -32,8 +22,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Iciql.IQTable(name = "dg_players")
@@ -198,10 +187,10 @@ public class PlayerModel implements Participant {
             player.sendMessage(ChatColor.GRAY + English.UNSAFE_FROM_PVP.getLine());
         } else if (!inNoPvpZone) {
             setCanPvp(true);
-            ServerData.remove(DataManager.DATA_MANAGER, player.getName(), "pvp_cooldown");
-        } else if (canPvp() && !ServerData.exists(DataManager.DATA_MANAGER, player.getName(), "pvp_cooldown")) {
-            int delay = Configs.getSettingInt("zones.pvp_area_delay_time");
-            ServerData.put(DataManager.DATA_MANAGER, player.getName(), "pvp_cooldown", true, delay, TimeUnit.SECONDS);
+            ServerDataUtil.remove(player.getName(), "pvp_cooldown");
+        } else if (canPvp() && !ServerDataUtil.exists(player.getName(), "pvp_cooldown")) {
+            int delay = StoaPlugin.config().getInt("zones.pvp_area_delay_time");
+            ServerDataUtil.put(true, delay, TimeUnit.SECONDS, player.getName(), "pvp_cooldown");
 
             Bukkit.getScheduler().scheduleSyncDelayedTask(StoaPlugin.getInst(), new BukkitRunnable() {
                 @Override
@@ -214,10 +203,9 @@ public class PlayerModel implements Participant {
                 }
             }, (delay * 20));
         }
-        return this;
     }
 
-    public PlayerController setToMortal() {
+    public void setToMortal() {
         Player player = getEntity();
         saveCurrentCharacter();
         player.setMaxHealth(20.0);
@@ -228,16 +216,16 @@ public class PlayerModel implements Participant {
         player.setGameMode(GameMode.SURVIVAL);
         for (PotionEffect potion : player.getActivePotionEffects())
             player.removePotionEffect(potion.getType());
-        player.setDisplayName(model.mortalName);
-        player.setPlayerListName(model.mortalListName);
+        player.setDisplayName(mortalName);
+        player.setPlayerListName(mortalListName);
         setMortalName(null);
         setMortalListName(null);
         applyMortalInventory();
-        return this;
     }
 
-    public PlayerController saveMortalInventory(Player player) {
+    public void saveMortalInventory(Player player) {
         // Player inventory
+        Db db = StoaServer.openDb();
         StoaPlayerInventory mortalInventory = new StoaPlayerInventory();
         PlayerInventory inventory = player.getInventory();
         mortalInventory.generateId();
@@ -246,28 +234,24 @@ public class PlayerModel implements Participant {
         if (inventory.getLeggings() != null) mortalInventory.setLeggings(inventory.getLeggings());
         if (inventory.getBoots() != null) mortalInventory.setBoots(inventory.getBoots());
         mortalInventory.setItems(inventory);
-        mortalInventory.save();
-        model.mortalInventoryId = mortalInventory.getId().toString();
+        db.update(mortalInventory);
+        mortalInventoryId = mortalInventory.getId().toString();
 
         // Enderchest
         StoaEnderInventory enderInventory = new StoaEnderInventory();
         Inventory enderChest = player.getEnderChest();
         enderInventory.generateId();
         enderInventory.setItems(enderChest);
-        enderInventory.save();
-        model.mortalEnderChestId = enderInventory.getId().toString();
-
-        return this;
+        db.update(enderInventory);
+        mortalEnderChestId = enderInventory.getId().toString();
     }
 
-    public PlayerController saveCurrentCharacter() {
+    public void saveCurrentCharacter() {
         // Update the current character
         final Player player = getEntity();
-        final CharacterController character = getCharacter();
+        final CharacterModel character = getCharacter();
 
         if (character != null) {
-            character.open();
-
             // Set to inactive and update previous
             character.setActive(false);
 
@@ -276,7 +260,7 @@ public class PlayerModel implements Participant {
             character.setHunger(player.getFoodLevel());
             character.setLevel(player.getLevel());
             character.setExperience(player.getExp());
-            character.setLocation(player.getLocation());
+            character.setLastLocation(player.getLocation());
             Bukkit.getScheduler().scheduleSyncDelayedTask(StoaPlugin.getInst(), new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -284,75 +268,83 @@ public class PlayerModel implements Participant {
                 }
             }, 1);
             character.setGameMode(player.getGameMode());
-            character.setPotionEffects(player.getActivePotionEffects());
+            // TODO character.setPotionEffects(player.getActivePotionEffects());
             character.saveInventory();
 
             // Disown pets
-            StoaTameable.disownPets(character.model.name);
+            StoaTameable.disownPets(character.name);
 
-            character.update();
-
-            character.relinquish();
+            // Update the db
+            Db db = StoaServer.openDb();
+            db.update(character);
+            db.close();
         }
-
-        return this;
     }
 
-    public PlayerController switchCharacter(final CharacterController newChar) {
+    public void switchCharacter(final CharacterModel newChar) {
         final Player player = getEntity();
 
-        if (!newChar.model.playerId.equals(model.id())) {
+        if (!newChar.playerId.equals(mojangAccount)) {
             player.sendMessage(ChatColor.RED + "You can't do that.");
-            return this;
-        }
+        } else {
 
-        // Save the current character
-        saveCurrentCharacter();
+            // Save the current character
+            saveCurrentCharacter();
 
-        // Set new character to active and other info
-        model.currentCharacterId = newChar.getModel().id();
+            // Set new character to active and other info
+            currentCharacterId = newChar.uuid;
 
-        // Apply the new character
-        newChar.applyToPlayer(player);
+            // Apply the new character
+            newChar.applyToPlayer(player);
 
-        // Teleport them
-        try {
-            player.teleport(LocationModel.fromId(newChar.model.locationId));
-        } catch (Exception e) {
-            MessageUtil.warning("There was a problem while teleporting a player to their character.");
-        }
-
-        // Save instances
-        open().update().close();
-        newChar.open().update().relinquish();
-
-        return this;
-    }
-
-    public Set<StoaCharacter> getUsableCharacters() {
-        return Sets.filter(getCharacters(), new Predicate<StoaCharacter>() {
-            @Override
-            public boolean apply(StoaCharacter character) {
-                return character.isUsable();
+            // Teleport them
+            try {
+                player.teleport(newChar.getLastLocation());
+            } catch (Exception e) {
+                MessageUtil.warning("There was a problem while teleporting a player to their character.");
             }
-        });
+
+            // Save instances
+            Db db = StoaServer.openDb();
+            db.update(this);
+            db.update(newChar);
+            db.close();
+        }
     }
 
-    public StoaPlayerInventory getMortalInventory() {
-        return StoaPlayerInventory.get(mortalInventory);
+    public List<CharacterModel> getUsableCharacters() {
+        CharacterModel alias = new CharacterModel();
+        Db db = StoaServer.openDb();
+        try {
+            return db.from(alias).where(alias.usable).is(true).and(alias.playerId).is(mojangAccount).select();
+        } finally {
+            db.close();
+        }
     }
 
-    public StoaEnderInventory getMortalEnderInventory() {
-        return StoaEnderInventory.get(mortalEnderInventory);
+    public PlayerInventoryModel getMortalInventory() {
+        return InventoryUtil.playerInvFromOwnerId("mortal;" + mojangAccount);
+    }
+
+    public EnderChestInventoryModel getMortalEnderInventory() {
+        return InventoryUtil.enderInvFromOwnerId("mortal;" + mojangAccount);
     }
 
     public void applyMortalInventory() {
-        if (getMortalInventory() == null) mortalInventory = StoaPlayerInventory.createEmpty().getId();
-        if (getMortalEnderInventory() == null) mortalEnderInventory = StoaEnderInventory.createEmpty().getId();
-        getMortalInventory().setToPlayer(getBukkitOfflinePlayer().getPlayer());
-        getMortalEnderInventory().setToPlayer(getBukkitOfflinePlayer().getPlayer());
-        mortalInventory = null;
-        mortalEnderInventory = null;
+        Db db = StoaServer.openDb();
+
+        PlayerInventoryModel inventoryModel = getMortalInventory();
+        inventoryModel.setToPlayer(getEntity());
+        inventoryModel.setArmor(null);
+        inventoryModel.setContents(null);
+        db.update(inventoryModel);
+
+        EnderChestInventoryModel enderModel = getMortalEnderInventory();
+        enderModel.setToPlayer(getEntity());
+        enderModel.setContents(null);
+        db.update(enderModel);
+
+        db.close();
     }
 
     public boolean canMakeCharacter() {
@@ -360,35 +352,42 @@ public class PlayerModel implements Participant {
     }
 
     public boolean canUseCurrent() {
-        if (getCharacter() == null || !getCharacter().isUsable()) {
-            getBukkitOfflinePlayer().getPlayer().sendMessage(ChatColor.RED + "Your current character was unable to init!");
-            getBukkitOfflinePlayer().getPlayer().sendMessage(ChatColor.RED + "Please contact the server administrator immediately.");
+        if (getCharacter() == null || !getCharacter().getUsable()) {
+            if (getOfflinePlayer().isOnline()) {
+                getOfflinePlayer().getPlayer().sendMessage(ChatColor.RED + "Your current character was unable to init!");
+                getOfflinePlayer().getPlayer().sendMessage(ChatColor.RED + "Please contact the server administrator immediately.");
+            }
             return false;
-        } else return getBukkitOfflinePlayer().isOnline();
+        }
+        return true;
     }
 
     public void remove() {
         // First we need to kick the player if they're online
-        if (getBukkitOfflinePlayer().isOnline())
-            getBukkitOfflinePlayer().getPlayer().kickPlayer(ChatColor.RED + "Your player save has been cleared.");
+        if (getOfflinePlayer().isOnline()) {
+            getEntity().kickPlayer(ChatColor.RED + "Your player save has been cleared.");
+        }
 
         // Remove characters
-        for (StoaCharacter character : getCharacters())
+        for (CharacterModel character : getCharacters()) {
             character.remove();
+        }
 
-        // Now we clear the DemigodsPlayer save itself
-        super.remove();
+        // Now we clear the save itself
+        Db db = StoaServer.openDb();
+        db.delete(this);
+        db.close();
     }
 
     public void sendNotification(Notification notification) {
-        if (getCharacter() != null) Notification.sendNotification(getCharacter(), notification);
+        // TODO if (getCharacter() != null) NotificationUtil.sendNotification(getCharacter(), notification);
     }
 
     /**
      * Starts recording recording the <code>player</code>'s chat.
      */
     public void startRecording() {
-        chatRecording = ChatRecorder.Util.startRecording(getBukkitOfflinePlayer().getPlayer());
+        chatRecorder = ChatRecorder.Util.startRecording(getEntity());
     }
 
     /**
@@ -397,11 +396,11 @@ public class PlayerModel implements Participant {
      * @param display if true, the chat will be sent to the player
      */
     public List<String> stopRecording(boolean display) {
-        Player player = getBukkitOfflinePlayer().getPlayer();
+        Player player = getEntity();
         // Handle recorded chat
-        if (chatRecording != null && chatRecording.isRecording()) {
+        if (chatRecorder != null && chatRecorder.isRecording()) {
             // Send held back chat
-            List<String> messages = chatRecording.stop();
+            List<String> messages = chatRecorder.stop();
             if (messages.size() > 0 && display) {
                 player.sendMessage(" ");
                 if (messages.size() == 1) {
@@ -418,77 +417,43 @@ public class PlayerModel implements Participant {
         return null;
     }
 
-    public static StoaPlayer getFromName(final String playerName) {
+
+    public boolean hasCharName(String name) {
+        CharacterModel alias = new CharacterModel();
+        Db db = StoaServer.openDb();
+
         try {
-            return Iterables.find(all(), new Predicate<StoaPlayer>() {
-                @Override
-                public boolean apply(StoaPlayer stoaPlayer) {
-                    return stoaPlayer.getPlayerName().equals(playerName);
-                }
-            });
-        } catch (NoSuchElementException ignored) {
+            return !db.from(alias).where(alias.playerId).is(mojangAccount).and(alias.name).is(name).select().isEmpty();
+        } finally {
+            db.close();
         }
-        return null;
-    }
-
-    /**
-     * Returns true if the <code>player</code> is currently immortal.
-     *
-     * @param player the player to check.
-     * @return boolean
-     */
-    public static boolean isImmortal(Player player) {
-        StoaCharacter character = of(player).getCharacter();
-        return character != null && character.isUsable() && character.isActive();
-    }
-
-    /**
-     * Returns true if <code>player</code> has a character with the name <code>charName</code>.
-     *
-     * @param player   the player to check.
-     * @param charName the charName to check with.
-     * @return boolean
-     */
-    public static boolean hasCharName(Player player, String charName) {
-        for (StoaCharacter character : of(player).getCharacters())
-            if (character.getName().equalsIgnoreCase(charName)) return true;
-        return false;
     }
 
     public List<CharacterModel> getCharacters() {
         CharacterModel alias = new CharacterModel();
-        Db db = openDb();
-        List<CharacterModel> found = db.from(alias).where(alias.playerId).is(model.id()).select();
-        db.close();
+        Db db = StoaServer.openDb();
 
-        return found;
+        try {
+            return db.from(alias).where(alias.playerId).is(mojangAccount).select();
+        } finally {
+            db.close();
+        }
     }
 
     @Override
-    public PlayerController control(String modelId) {
-        return (PlayerController) control(modelId, new PlayerModel());
-    }
-
-    @Override
-    public PlayerController refresh() {
-        model = Iterables.getFirst(DB.from(model).where(model.mojangAccount).is(model.id()).select(), model);
-        return this;
-    }
-
-    @Override
-    public CharacterController getCharacter() {
+    public CharacterModel getCharacter() {
         if (!hasCharacter()) return null;
-        return new CharacterController().control(model.currentCharacterId);
+        return CharacterUtil.fromId(currentCharacterId);
     }
 
     @Override
     public boolean hasCharacter() {
-        return model.currentCharacterId != null;
+        return currentCharacterId != null;
     }
 
     @Override
     public boolean canPvp() {
-        return model.canPvp;
+        return canPvp;
     }
 
     @Override
@@ -497,8 +462,12 @@ public class PlayerModel implements Participant {
         return getEntity().getLocation();
     }
 
+    public OfflinePlayer getOfflinePlayer() {
+        return Bukkit.getOfflinePlayer(UUID.fromString(mojangAccount));
+    }
+
     @Override
     public Player getEntity() {
-        return Bukkit.getPlayer(model.mojangAccount);
+        return Bukkit.getPlayer(mojangAccount);
     }
 }

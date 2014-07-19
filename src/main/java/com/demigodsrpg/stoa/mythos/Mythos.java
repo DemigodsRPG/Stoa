@@ -6,7 +6,7 @@ import com.censoredsoftware.library.util.Items;
 import com.demigodsrpg.stoa.deity.Alliance;
 import com.demigodsrpg.stoa.deity.Deity;
 import com.demigodsrpg.stoa.item.DivineItem;
-import com.demigodsrpg.stoa.model.StoaStructureModel;
+import com.demigodsrpg.stoa.model.StructureModel;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.Iterables;
@@ -47,9 +47,9 @@ public interface Mythos {
 
     Deity getDeity(String deityName);
 
-    ImmutableCollection<StoaStructureModel.Type> getStructures();
+    ImmutableCollection<StructureModel.Type> getStructures();
 
-    StoaStructureModel.Type getStructure(String structureName);
+    StructureModel.Type getStructure(String structureName);
 
     Boolean levelSeperateSkills();
 
@@ -127,11 +127,11 @@ public interface Mythos {
             return null;
         }
 
-        public static StoaStructureModel.Type getStructure(Mythos mythos, final String structureName) {
+        public static StructureModel.Type getStructure(Mythos mythos, final String structureName) {
             try {
-                return Iterables.find(mythos.getStructures(), new Predicate<StoaStructureModel.Type>() {
+                return Iterables.find(mythos.getStructures(), new Predicate<StructureModel.Type>() {
                     @Override
-                    public boolean apply(StoaStructureModel.Type structureType) {
+                    public boolean apply(StructureModel.Type structureType) {
                         return structureName.equals(structureType.getName());
                     }
                 });

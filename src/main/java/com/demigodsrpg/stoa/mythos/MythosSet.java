@@ -6,7 +6,7 @@ import com.demigodsrpg.stoa.StoaPlugin;
 import com.demigodsrpg.stoa.deity.Alliance;
 import com.demigodsrpg.stoa.deity.Deity;
 import com.demigodsrpg.stoa.item.DivineItem;
-import com.demigodsrpg.stoa.model.StoaStructureModel;
+import com.demigodsrpg.stoa.model.StructureModel;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.*;
@@ -24,7 +24,7 @@ public class MythosSet implements Mythos {
     private final ImmutableSet<DivineItem> DIVINE_ITEMS;
     private final ImmutableSet<Alliance> ALLIANCES;
     private final ImmutableSet<Deity> DEITIES;
-    private final ImmutableSet<StoaStructureModel.Type> STRUCTURES;
+    private final ImmutableSet<StructureModel.Type> STRUCTURES;
     private final ImmutableSet<Listener> LISTENERS;
     private final ImmutableSet<Permission> PERMISSIONS;
     private final ImmutableSet<CommandManager> COMMANDS;
@@ -47,7 +47,7 @@ public class MythosSet implements Mythos {
         Set<DivineItem> divineItems = Sets.newHashSet();
         Set<Alliance> alliance = Sets.newHashSet();
         Set<Deity> deity = Sets.newHashSet();
-        Set<StoaStructureModel.Type> structureType = Sets.newHashSet();
+        Set<StructureModel.Type> structureType = Sets.newHashSet();
         Set<Listener> listener = Sets.newHashSet();
         Set<Permission> permission = Sets.newHashSet();
         Set<CommandManager> command = Sets.newHashSet();
@@ -160,12 +160,12 @@ public class MythosSet implements Mythos {
     }
 
     @Override
-    public ImmutableCollection<StoaStructureModel.Type> getStructures() {
+    public ImmutableCollection<StructureModel.Type> getStructures() {
         return STRUCTURES;
     }
 
     @Override
-    public StoaStructureModel.Type getStructure(final String structureName) {
+    public StructureModel.Type getStructure(final String structureName) {
         return Mythos.Util.getStructure(this, structureName);
     }
 

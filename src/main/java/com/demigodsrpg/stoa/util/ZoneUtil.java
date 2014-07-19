@@ -4,7 +4,7 @@ import com.censoredsoftware.library.util.WorldGuards;
 import com.demigodsrpg.stoa.StoaPlugin;
 import com.demigodsrpg.stoa.entity.player.StoaCharacter;
 import com.demigodsrpg.stoa.listener.ZoneListener;
-import com.demigodsrpg.stoa.model.StoaStructureModel;
+import com.demigodsrpg.stoa.model.StructureModel;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
@@ -56,8 +56,8 @@ public class ZoneUtil {
     public static boolean inNoPvpZone(Location location) {
         if (PLUGIN_CONFIG.getBoolean("zones.allow_skills_anywhere")) return false;
         if (WorldGuards.worldGuardEnabled())
-            return StoaStructureModel.Type.Util.isInRadiusWithFlag(location, StoaStructureModel.Type.Flag.NO_PVP) || !WorldGuards.canPVP(location);
-        return StoaStructureModel.Type.Util.isInRadiusWithFlag(location, StoaStructureModel.Type.Flag.NO_PVP);
+            return StructureUtil.isInRadiusWithFlag(location, StructureModel.Flag.NO_PVP) || !WorldGuards.canPVP(location);
+        return StructureUtil.isInRadiusWithFlag(location, StructureModel.Flag.NO_PVP);
     }
 
     /**
@@ -70,8 +70,8 @@ public class ZoneUtil {
      */
     public static boolean inNoBuildZone(Player player, Location location) {
         if (WorldGuards.worldGuardEnabled() && !WorldGuards.canBuild(player, location)) return true;
-        StoaStructureModel save = Iterables.getFirst(StoaStructureModel.Type.Util.getInRadiusWithFlag(location, StoaStructureModel.Type.Flag.NO_GRIEFING), null);
-        return StoaCharacter.of(player) != null && save != null && !StoaCharacter.of(player).getId().equals(save.getOwner());
+        StructureModel save = Iterables.getFirst(StructureUtil.getInRadiusWithFlag(location, StructureModel.Flag.NO_GRIEFING), null);
+        return StoaCharacter.of(player) != null && save != null && !CharacterUtil.currentFromPlayer(player).uuid.equals(save.getOwnerId());
     }
 
     public static boolean inNoStoaZone(Location location) {
