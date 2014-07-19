@@ -56,6 +56,37 @@ public class Battle {
         participants.add(startedBy);
     }
 
+    public double getRadius() {
+        int base = StoaPlugin.config().getInt("battles.min_radius");
+        if (participants.size() > 2) return base * Math.log10(10 + Math.ceil(Math.pow(participants.size(), 1.5)));
+        return base;
+    }
+
+    public boolean isActive() {
+        return this.active;
+    }
+
+    public long getDuration() {
+        long base = StoaPlugin.config().getInt("battles.min_duration") * 1000;
+        long per = StoaPlugin.config().getInt("battles.duration_multiplier") * 1000;
+        if (participants.size() > 2) return base + (per * (participants.size() - 2));
+        return base;
+    }
+
+    public int getMinKills() {
+        int base = StoaPlugin.config().getInt("battles.min_kills");
+        int per = 2;
+        if (participants.size() > 2) return base + (per * (participants.size() - 2));
+        return base;
+    }
+
+    public int getMaxKills() {
+        int base = StoaPlugin.config().getInt("battles.max_kills");
+        int per = 3;
+        if (participants.size() > 2) return base + (per * (participants.size() - 2));
+        return base;
+    }
+
     public Boolean getActive() {
         return active;
     }

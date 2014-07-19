@@ -8,7 +8,7 @@
     <artifactId>stoa</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
-    <name>Stoa Bukkit RPG Framework</name>
+    <name>Stoa Bukkit ARPG Framework</name>
     <inceptionYear>2013</inceptionYear>
     <url>http://github.com/DemigodsRPG/Stoa</url>
 
@@ -30,7 +30,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <censoredlib.version>1.0.0-SNAPSHOT</censoredlib.version>
         <spigot.version>1.7.10-R0.1-SNAPSHOT</spigot.version>
-        <minecraft_version>1_7_R4</minecraft_version>
     </properties>
 
     <repositories>
@@ -126,37 +125,14 @@
                             <artifactSet>
                                 <includes>
                                     <include>com.censoredsoftware.library:*</include>
-                                    <include>org.javatuples:javatuples</include>
                                     <include>com.iciql:iciql</include>
                                     <include>postgresql:postgresql</include>
                                 </includes>
                             </artifactSet>
                             <relocations>
                                 <relocation>
-                                    <pattern>org.javatuples</pattern>
-                                    <shadedPattern>com.demigodsrpg.stoa.shaded.org.javatuples</shadedPattern>
-                                </relocation>
-
-                                <relocation>
                                     <pattern>com.iciql</pattern>
                                     <shadedPattern>com.demigodsrpg.stoa.shaded.com.iciql</shadedPattern>
-                                </relocation>
-
-                                <!-- Redo the damage for compatibility -->
-                                <relocation>
-                                    <pattern>org.bouncycastle</pattern>
-                                    <shadedPattern>net.minecraft.v${minecraft_version}.org.bouncycastle</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.bukkit.craftbukkit</pattern>
-                                    <shadedPattern>org.bukkit.craftbukkit.v${minecraft_version}</shadedPattern>
-                                    <excludes>
-                                        <exclude>org.bukkit.craftbukkit.Main*</exclude>
-                                    </excludes>
-                                </relocation>
-                                <relocation>
-                                    <pattern>net.minecraft.server</pattern>
-                                    <shadedPattern>net.minecraft.server.v${minecraft_version}</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>
