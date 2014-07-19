@@ -8,7 +8,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Iciql.IQTable(name = "notifications")
-public class NotificationModel implements Model {
+public class NotificationModel implements Battle {
     // -- DEFAULT CONSTRUCTOR -- //
     public NotificationModel() {
     }
