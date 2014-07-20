@@ -109,4 +109,17 @@ public class ServerDataUtil {
         String completeKey = builder.toString();
         return completeKey.substring(0, completeKey.length() - 2);
     }
+
+    public static void clearExpired() {
+        ServerDataModel alias = new ServerDataModel();
+        Db db = StoaServer.openDb();
+
+        for (ServerDataModel model : db.from(alias).select()) {
+            if (model.expired()) {
+                db.delete(model);
+            }
+        }
+
+        db.close();
+    }
 }

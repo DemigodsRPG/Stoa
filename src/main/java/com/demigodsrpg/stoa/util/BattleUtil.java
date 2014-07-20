@@ -1,19 +1,18 @@
 package com.demigodsrpg.stoa.util;
 
-import com.censoredsoftware.library.util.Randoms;
-import com.censoredsoftware.library.util.Vehicles;
+import com.demigodsrpg.stoa.StoaPlugin;
 import com.demigodsrpg.stoa.StoaServer;
+import com.demigodsrpg.stoa.battle.Battle;
 import com.demigodsrpg.stoa.battle.Participant;
 import com.demigodsrpg.stoa.deity.Alliance;
 import com.demigodsrpg.stoa.deity.Deity;
-import com.demigodsrpg.stoa.entity.StoaTameable;
-import com.demigodsrpg.stoa.entity.player.StoaCharacter;
 import com.demigodsrpg.stoa.event.BattleDeathEvent;
 import com.demigodsrpg.stoa.language.English;
-import com.demigodsrpg.stoa.model.Battle;
+import com.demigodsrpg.stoa.model.CharacterModel;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import org.bukkit.*;
@@ -34,30 +33,30 @@ import java.util.NoSuchElementException;
 
 public class BattleUtil {
     public static Battle create(Participant damager, Participant damaged) {
-        Battle battle = new Battle();
+        Battle battle = new Battle(damager, damaged);
 
         // Log the creation
-        MessageUtil.info(English.LOG_BATTLE_STARTED.getLine().replace("{locX}", battle.getStartLocation().getX() + "").replace("{locY}", battle.getStartLocation().getY() + "").replace("{locZ}", battle.getStartLocation().getZ() + "").replace("{world}", battle.getStartLocation().getWorld().getName()).replace("{starter}", battle.getStarter().getName()));
+        MessageUtil.info(English.LOG_BATTLE_STARTED.getLine().replace("{locX}", battle.getStartLocation().getX() + "").replace("{locY}", battle.getStartLocation().getY() + "").replace("{locZ}", battle.getStartLocation().getZ() + "").replace("{world}", battle.getStartLocation().getWorld().getName()).replace("{starter}", battle.getStartedBy().getCharacter().getName()));
 
         return battle;
     }
 
-    public static List<Battle> getAllActive() {
-        return Lists.newArrayList(Collections2.filter(all(), new Predicate<Battle>() {
+    public static Collection<Battle> getAllActive() {
+        return Collections2.filter(Battle.BATTLE_MAP.values(), new Predicate<Battle>() {
             @Override
             public boolean apply(Battle battle) {
-                return battle.isActive();
+                return battle.getActive();
             }
-        }));
+        });
     }
 
-    public static List<Battle> getAllInactive() {
-        return Lists.newArrayList(Collections2.filter(all(), new Predicate<Battle>() {
+    public static Collection<Battle> getAllInactive() {
+        return Collections2.filter(Battle.BATTLE_MAP.values(), new Predicate<Battle>() {
             @Override
             public boolean apply(Battle battle) {
-                return !battle.isActive();
+                return !battle.getActive();
             }
-        }));
+        });
     }
 
     public static boolean existsInRadius(Location location) {
@@ -65,17 +64,12 @@ public class BattleUtil {
     }
 
     public static Battle getInRadius(final Location location) {
-        try {
-            return Iterators.find(getAllActive().iterator(), new Predicate<Battle>() {
-                @Override
-                public boolean apply(Battle battle) {
-                    return battle.getStartLocation().distance(location) <= battle.getRadius();
-                }
-            });
-        } catch (NoSuchElementException ignored) {
-            // ignored
-        }
-        return null;
+        return Iterables.find(Battle.BATTLE_MAP.values(), new Predicate<Battle>() {
+            @Override
+            public boolean apply(Battle battle) {
+                return battle.getActive() && battle.getStartLocation().distance(location) <= battle.getRadius();
+            }
+        }, null);
     }
 
     public static boolean isInBattle(final Participant participant) {
@@ -111,7 +105,7 @@ public class BattleUtil {
                 @Override
                 public boolean apply(Battle battle) {
                     double distance = battle.getStartLocation().distance(location);
-                    return distance > battle.getRadius() && distance <= Configs.getSettingInt("battles.merge_radius");
+                    return distance > battle.getRadius() && distance <= StoaPlugin.config().getInt("battles.merge_radius");
                 }
             });
         } catch (NoSuchElementException ignored) {
@@ -122,7 +116,7 @@ public class BattleUtil {
 
     public static Collection<Location> battleBorder(final Battle battle) {
         if (!StoaServer.isRunningSpigot()) throw new RuntimeException("Cannot find Spigot.");
-        return Collections2.transform(StoaLocation.getCirclePoints(battle.getStartLocation().getBukkitLocation(), battle.getRadius(), 120), new Function<Location, Location>() {
+        return Collections2.transform(LocationUtil.getCirclePoints(battle.getStartLocation(), battle.getRadius(), 120), new Function<Location, Location>() {
             @Override
             public Location apply(Location point) {
                 return new Location(point.getWorld(), point.getBlockX(), point.getWorld().getHighestBlockYAt(point), point.getBlockZ());
@@ -135,19 +129,19 @@ public class BattleUtil {
      */
     public static Location randomRespawnPoint(Battle battle) {
         List<Location> respawnPoints = getSafeRespawnPoints(battle);
-        if (respawnPoints.size() == 0) return battle.getStartLocation().getBukkitLocation();
+        if (respawnPoints.size() == 0) return battle.getStartLocation();
 
-        Location target = respawnPoints.get(Randoms.generateIntRange(0, respawnPoints.size() - 1));
+        Location target = respawnPoints.get(RandomUtil.generateIntRange(0, respawnPoints.size() - 1));
 
-        Vector direction = target.toVector().subtract(battle.getStartLocation().getBukkitLocation().toVector()).normalize();
+        Vector direction = target.toVector().subtract(battle.getStartLocation().toVector()).normalize();
         double X = direction.getX();
         double Y = direction.getY();
         double Z = direction.getZ();
 
         // Now change the angle FIXME
         Location changed = target.clone();
-        changed.setYaw(180 - StoaLocation.toDegree(Math.atan2(Y, X)));
-        changed.setPitch(90 - StoaLocation.toDegree(Math.acos(Z)));
+        changed.setYaw(180 - LocationUtil.toDegree(Math.atan2(Y, X)));
+        changed.setPitch(90 - LocationUtil.toDegree(Math.acos(Z)));
         return changed;
     }
 
@@ -155,15 +149,16 @@ public class BattleUtil {
      * This is completely broken. TODO
      */
     public static boolean isSafeLocation(Location reference, Location checking) {
-        if (checking.getBlock().getType().isSolid() || checking.getBlock().getType().equals(Material.LAVA))
+        if (checking.getBlock().getType().isSolid() || checking.getBlock().getType().equals(Material.LAVA)) {
             return false;
+        }
         double referenceY = reference.getY();
         double checkingY = checking.getY();
         return Math.abs(referenceY - checkingY) <= 5;
     }
 
     public static List<Location> getSafeRespawnPoints(final Battle battle) {
-        return Lists.newArrayList(Collections2.filter(Collections2.transform(StoaLocation.getCirclePoints(battle.getStartLocation().getBukkitLocation(), battle.getRadius() - 1.5, 100), new Function<Location, Location>() {
+        return Lists.newArrayList(Collections2.filter(Collections2.transform(LocationUtil.getCirclePoints(battle.getStartLocation(), battle.getRadius() - 1.5, 100), new Function<Location, Location>() {
             @Override
             public Location apply(Location point) {
                 return new Location(point.getWorld(), point.getBlockX(), point.getWorld().getHighestBlockYAt(point), point.getBlockZ());
@@ -171,46 +166,46 @@ public class BattleUtil {
         }), new Predicate<Location>() {
             @Override
             public boolean apply(Location location) {
-                return isSafeLocation(battle.getStartLocation().getBukkitLocation(), location);
+                return isSafeLocation(battle.getStartLocation(), location);
             }
         }));
     }
 
     public static boolean canParticipate(Entity entity) {
         if (entity instanceof Player) {
-            StoaCharacter character = StoaCharacter.of((Player) entity);
+            CharacterModel character = CharacterUtil.currentFromPlayer((Player) entity);
             return character != null && !character.getDeity().getFlags().contains(Deity.Flag.NO_BATTLE);
         }
-        return entity instanceof Tameable && StoaTameable.of((LivingEntity) entity) != null && isInBattle(StoaTameable.of((LivingEntity) entity).getRelatedCharacter());
+        return entity instanceof Tameable && TameableUtil.fromEntity((LivingEntity) entity) != null && isInBattle(TameableUtil.fromEntity((LivingEntity) entity).getCharacter());
     }
 
     public static Participant defineParticipant(Entity entity) {
         if (!canParticipate(entity)) return null;
-        if (entity instanceof Player) return StoaCharacter.of((Player) entity);
-        return StoaTameable.of((LivingEntity) entity);
+        if (entity instanceof Player) return CharacterUtil.currentFromPlayer((Player) entity);
+        return TameableUtil.fromEntity((LivingEntity) entity);
     }
 
     public static void battleDeath(Participant damager, Participant damagee, Battle battle) {
         BattleDeathEvent event = new BattleDeathEvent(battle, damagee, damager);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) return;
-        if (damager instanceof StoaCharacter) ((StoaCharacter) damager).addKill();
-        if (damager.getRelatedCharacter().getBukkitOfflinePlayer().isOnline())
-            damager.getRelatedCharacter().getBukkitOfflinePlayer().getPlayer().sendMessage(ChatColor.GREEN + "+1 Kill.");
+        if (damager instanceof CharacterModel) ((CharacterModel) damager).addKill();
+        if (damager.getOfflinePlayer().isOnline())
+            damager.getOfflinePlayer().getPlayer().sendMessage(ChatColor.GREEN + "+1 Kill.");
         battle.addKill(damager);
         damagee.getEntity().setHealth(damagee.getEntity().getMaxHealth());
-        Vehicles.teleport(damagee.getEntity(), randomRespawnPoint(battle));
-        if (damagee instanceof StoaCharacter) {
-            StoaCharacter character = (StoaCharacter) damagee;
-            Player player = character.getBukkitOfflinePlayer().getPlayer();
+        VehicleUtil.teleport(damagee.getEntity(), randomRespawnPoint(battle));
+        if (damagee instanceof CharacterModel) {
+            CharacterModel character = (CharacterModel) damagee;
+            Player player = character.getEntity();
             player.setFoodLevel(20);
             for (PotionEffect potionEffect : player.getActivePotionEffects())
                 player.removePotionEffect(potionEffect.getType());
             character.setPotionEffects(player.getActivePotionEffects());
-            character.addDeath(damager.getRelatedCharacter());
+            character.addDeath();
         }
-        if (damagee.getRelatedCharacter().getBukkitOfflinePlayer().isOnline())
-            damagee.getRelatedCharacter().getBukkitOfflinePlayer().getPlayer().sendMessage(ChatColor.RED + "+1 Death.");
+        if (damagee.getOfflinePlayer().isOnline())
+            damagee.getOfflinePlayer().getPlayer().sendMessage(ChatColor.RED + "+1 Death.");
         battle.addDeath(damagee);
     }
 
@@ -220,9 +215,9 @@ public class BattleUtil {
         if (event.isCancelled()) return;
         damagee.getEntity().setHealth(damagee.getEntity().getMaxHealth());
         damagee.getEntity().teleport(randomRespawnPoint(battle));
-        if (damagee instanceof StoaCharacter) ((StoaCharacter) damagee).addDeath();
-        if (damagee.getRelatedCharacter().getBukkitOfflinePlayer().isOnline())
-            damagee.getRelatedCharacter().getBukkitOfflinePlayer().getPlayer().sendMessage(ChatColor.RED + "+1 Death.");
+        if (damagee instanceof CharacterModel) ((CharacterModel) damagee).addDeath();
+        if (damagee.getOfflinePlayer().isOnline())
+            damagee.getOfflinePlayer().getPlayer().sendMessage(ChatColor.RED + "+1 Death.");
         battle.addDeath(damagee);
     }
 
@@ -262,7 +257,7 @@ public class BattleUtil {
             }
         })) {
             battle.end();
-            Skill.processBattle(battle);
+            SkillUtil.processBattle(battle);
         }
 
         // Delete all inactive battles that should be deleted.
@@ -303,7 +298,7 @@ public class BattleUtil {
         }
 
         Score participants = info.getScore(Bukkit.getOfflinePlayer(ChatColor.GRAY + "Participants"));
-        participants.setScore(battle.involvedPlayers.size());
+        participants.setScore(battle.getParticipants().size());
 
         Score points = info.getScore(Bukkit.getOfflinePlayer(ChatColor.GRAY + "Duration"));
         points.setScore((int) (System.currentTimeMillis() - battle.getStartTime()) / 1000);

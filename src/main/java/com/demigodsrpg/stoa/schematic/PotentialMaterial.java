@@ -21,7 +21,7 @@ import org.bukkit.Material;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StoaMaterialData {
+public class PotentialMaterial {
     private Material material;
     private byte data;
     private int odds;
@@ -32,7 +32,7 @@ public class StoaMaterialData {
      *
      * @param material Material of the block.
      */
-    public StoaMaterialData(Material material) {
+    public PotentialMaterial(Material material) {
         this.material = material;
         this.data = 0;
         this.odds = 100;
@@ -44,7 +44,7 @@ public class StoaMaterialData {
      *
      * @param material Material of the block.
      */
-    public StoaMaterialData(Material material, boolean physics) {
+    public PotentialMaterial(Material material, boolean physics) {
         this.material = material;
         this.data = 0;
         this.odds = 100;
@@ -57,8 +57,8 @@ public class StoaMaterialData {
      * @param material Material of the block.
      * @param odds     The odds of this object being generated.
      */
-    public StoaMaterialData(Material material, int odds) {
-        if (odds == 0 || odds > 100) throw new StoaMaterialDataException();
+    public PotentialMaterial(Material material, int odds) {
+        if (odds == 0 || odds > 100) throw new PotentialMaterialException();
         this.material = material;
         this.data = 100;
         this.odds = odds;
@@ -71,8 +71,8 @@ public class StoaMaterialData {
      * @param material Material of the block.
      * @param odds     The odds of this object being generated.
      */
-    public StoaMaterialData(Material material, int odds, boolean physics) {
-        if (odds == 0 || odds > 100) throw new StoaMaterialDataException();
+    public PotentialMaterial(Material material, int odds, boolean physics) {
+        if (odds == 0 || odds > 100) throw new PotentialMaterialException();
         this.material = material;
         this.data = 100;
         this.odds = odds;
@@ -85,7 +85,7 @@ public class StoaMaterialData {
      * @param material Material of the block.
      * @param data     Byte data of the block.
      */
-    public StoaMaterialData(Material material, byte data) {
+    public PotentialMaterial(Material material, byte data) {
         this.material = material;
         this.data = data;
         this.odds = 100;
@@ -98,7 +98,7 @@ public class StoaMaterialData {
      * @param material Material of the block.
      * @param data     Byte data of the block.
      */
-    public StoaMaterialData(Material material, byte data, boolean physics) {
+    public PotentialMaterial(Material material, byte data, boolean physics) {
         this.material = material;
         this.data = data;
         this.odds = 100;
@@ -112,8 +112,8 @@ public class StoaMaterialData {
      * @param data     Byte data of the block.
      * @param odds     The odds of this object being generated.
      */
-    public StoaMaterialData(Material material, byte data, int odds) {
-        if (odds == 0 || odds > 100) throw new StoaMaterialDataException();
+    public PotentialMaterial(Material material, byte data, int odds) {
+        if (odds == 0 || odds > 100) throw new PotentialMaterialException();
         this.material = material;
         this.data = data;
         this.odds = odds;
@@ -127,8 +127,8 @@ public class StoaMaterialData {
      * @param data     Byte data of the block.
      * @param odds     The odds of this object being generated.
      */
-    public StoaMaterialData(Material material, byte data, int odds, boolean physics) {
-        if (odds == 0 || odds > 100) throw new StoaMaterialDataException();
+    public PotentialMaterial(Material material, byte data, int odds, boolean physics) {
+        if (odds == 0 || odds > 100) throw new PotentialMaterialException();
         this.material = material;
         this.data = data;
         this.odds = odds;
@@ -172,43 +172,43 @@ public class StoaMaterialData {
     }
 
     public static enum Preset {
-        STONE_BRICK(new ArrayList<StoaMaterialData>(3) {
+        STONE_BRICK(new ArrayList<PotentialMaterial>(3) {
             {
-                add(new StoaMaterialData(Material.SMOOTH_BRICK, 80));
-                add(new StoaMaterialData(Material.SMOOTH_BRICK, (byte) 1, 10));
-                add(new StoaMaterialData(Material.SMOOTH_BRICK, (byte) 2, 10));
+                add(new PotentialMaterial(Material.SMOOTH_BRICK, 80));
+                add(new PotentialMaterial(Material.SMOOTH_BRICK, (byte) 1, 10));
+                add(new PotentialMaterial(Material.SMOOTH_BRICK, (byte) 2, 10));
             }
-        }), SANDY_GRASS(new ArrayList<StoaMaterialData>(2) {
+        }), SANDY_GRASS(new ArrayList<PotentialMaterial>(2) {
             {
-                add(new StoaMaterialData(Material.SAND, 65));
-                add(new StoaMaterialData(Material.GRASS, 35));
+                add(new PotentialMaterial(Material.SAND, 65));
+                add(new PotentialMaterial(Material.GRASS, 35));
             }
-        }), PRETTY_FLOWERS_AND_GRASS(new ArrayList<StoaMaterialData>(4) {
+        }), PRETTY_FLOWERS_AND_GRASS(new ArrayList<PotentialMaterial>(4) {
             {
-                add(new StoaMaterialData(Material.AIR, 50));
-                add(new StoaMaterialData(Material.LONG_GRASS, (byte) 1, 35, true));
-                add(new StoaMaterialData(Material.YELLOW_FLOWER, 9, true));
-                add(new StoaMaterialData(Material.RED_ROSE, 6, true));
+                add(new PotentialMaterial(Material.AIR, 50));
+                add(new PotentialMaterial(Material.LONG_GRASS, (byte) 1, 35, true));
+                add(new PotentialMaterial(Material.YELLOW_FLOWER, 9, true));
+                add(new PotentialMaterial(Material.RED_ROSE, 6, true));
             }
-        }), VINE_1(new ArrayList<StoaMaterialData>(2) {
+        }), VINE_1(new ArrayList<PotentialMaterial>(2) {
             {
-                add(new StoaMaterialData(Material.VINE, (byte) 1, 40));
-                add(new StoaMaterialData(Material.AIR, 60));
+                add(new PotentialMaterial(Material.VINE, (byte) 1, 40));
+                add(new PotentialMaterial(Material.AIR, 60));
             }
-        }), VINE_4(new ArrayList<StoaMaterialData>(2) {
+        }), VINE_4(new ArrayList<PotentialMaterial>(2) {
             {
-                add(new StoaMaterialData(Material.VINE, (byte) 4, 40));
-                add(new StoaMaterialData(Material.AIR, 60));
+                add(new PotentialMaterial(Material.VINE, (byte) 4, 40));
+                add(new PotentialMaterial(Material.AIR, 60));
             }
         });
 
-        private List<StoaMaterialData> data;
+        private List<PotentialMaterial> data;
 
-        private Preset(List<StoaMaterialData> data) {
+        private Preset(List<PotentialMaterial> data) {
             this.data = data;
         }
 
-        public List<StoaMaterialData> getData() {
+        public List<PotentialMaterial> getData() {
             return data;
         }
     }

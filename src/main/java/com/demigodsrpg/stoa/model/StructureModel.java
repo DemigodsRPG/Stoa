@@ -3,7 +3,6 @@ package com.demigodsrpg.stoa.model;
 import com.demigodsrpg.stoa.Stoa;
 import com.demigodsrpg.stoa.StoaPlugin;
 import com.demigodsrpg.stoa.StoaServer;
-import com.demigodsrpg.stoa.entity.player.StoaCharacter;
 import com.demigodsrpg.stoa.schematic.Schematic;
 import com.demigodsrpg.stoa.util.MetaUtil;
 import com.iciql.Db;
@@ -53,8 +52,8 @@ public class StructureModel {
     public StructureModel() {
     }
 
-    public StructureModel(StoaCharacter owner, Block center, Type type, Design design) {
-        this(owner.getId().toString(), center, type, design);
+    public StructureModel(CharacterModel owner, Block center, Type type, Design design) {
+        this(owner.getId(), center, type, design);
     }
 
     public StructureModel(String ownerId, Block center, Type type, Design design) {
@@ -94,7 +93,7 @@ public class StructureModel {
         }
     }
 
-    public void sanctify(StoaCharacter character, double amount) {
+    public void sanctify(CharacterModel character, double amount) {
         if (getType().sanctify(this, character)) {
             sanctify(amount);
         }
@@ -107,7 +106,7 @@ public class StructureModel {
         sanctity = sanctity + amount;
     }
 
-    public void corrupt(StoaCharacter character, double amount) {
+    public void corrupt(CharacterModel character, double amount) {
         if (getType().corrupt(this, character)) {
             corrupt(amount);
             if (corruption >= sanctity && getType().kill(this, character)) {
@@ -171,19 +170,19 @@ public class StructureModel {
         this.design = design;
     }
 
-    public boolean sanctify(StoaCharacter character) {
+    public boolean sanctify(CharacterModel character) {
         return type.sanctify(this, character);
     }
 
-    public boolean corrupt(StoaCharacter character) {
+    public boolean corrupt(CharacterModel character) {
         return type.corrupt(this, character);
     }
 
-    public boolean birth(StoaCharacter character) {
+    public boolean birth(CharacterModel character) {
         return type.birth(this, character);
     }
 
-    public boolean kill(StoaCharacter character) {
+    public boolean kill(CharacterModel character) {
         return type.kill(this, character);
     }
 
@@ -217,13 +216,13 @@ public class StructureModel {
 
         Listener getListener();
 
-        boolean sanctify(StructureModel data, StoaCharacter character);
+        boolean sanctify(StructureModel data, CharacterModel character);
 
-        boolean corrupt(StructureModel data, StoaCharacter character);
+        boolean corrupt(StructureModel data, CharacterModel character);
 
-        boolean birth(StructureModel data, StoaCharacter character);
+        boolean birth(StructureModel data, CharacterModel character);
 
-        boolean kill(StructureModel data, StoaCharacter character);
+        boolean kill(StructureModel data, CharacterModel character);
 
         double getDefSanctity();
 

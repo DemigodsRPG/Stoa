@@ -1,19 +1,10 @@
-package com.demigodsrpg.stoa.data;
+package com.demigodsrpg.stoa.data.thread;
 
-import com.censoredsoftware.library.data.ServerData;
-import com.censoredsoftware.library.util.Threads;
 import com.demigodsrpg.stoa.Stoa;
 import com.demigodsrpg.stoa.StoaPlugin;
-import com.demigodsrpg.stoa.battle.Battle;
 import com.demigodsrpg.stoa.deity.Ability;
 import com.demigodsrpg.stoa.deity.Deity;
-import com.demigodsrpg.stoa.entity.player.StoaCharacter;
-import com.demigodsrpg.stoa.entity.player.StoaPlayer;
-import com.demigodsrpg.stoa.entity.player.attribute.Notification;
-import com.demigodsrpg.stoa.structure.StoaStructureModel.Type;
-import com.demigodsrpg.stoa.util.Configs;
-import com.demigodsrpg.stoa.util.MessageUtil;
-import com.demigodsrpg.stoa.util.ZoneUtil;
+import com.demigodsrpg.stoa.util.*;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -31,34 +22,34 @@ public class TaskManager {
                 // Update online players
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     if (ZoneUtil.inNoStoaZone(player.getLocation())) continue;
-                    StoaPlayer.of(player).updateCanPvp();
+                    PlayerUtil.fromPlayer(player).updateCanPvp();
                 }
 
                 // Update Battles
-                Battle.updateBattles();
+                BattleUtil.updateBattles();
 
                 // Update Battle Particles
-                Battle.updateBattleParticles();
+                BattleUtil.updateBattleParticles();
             }
         };
         ASYNC = new BukkitRunnable() {
             @Override
             public void run() {
                 // Update Timed Data
-                ServerData.clearExpired();
+                ServerDataUtil.clearExpired();
 
                 // Update Notifications
-                Notification.updateNotifications();
+                // Notification.updateNotifications();
             }
         };
         FAVOR = new BukkitRunnable() {
             @Override
             public void run() {
                 // Update Favor
-                StoaCharacter.updateFavor();
+                CharacterUtil.updateFavor();
 
                 // Update Sanctity
-                StoaStructureModel.Type.Util.updateSanctity();
+                StructureUtil.updateSanctity();
             }
         };
     }
@@ -75,11 +66,8 @@ public class TaskManager {
         MessageUtil.sendDebug("Main Demigods ASYNC runnable enabled...");
 
         // Start favor runnable
-        scheduler.scheduleAsyncRepeatingTask(StoaPlugin.getInst(), FAVOR, 20, (Configs.getSettingInt("regeneration_rates.favor") * 20));
+        scheduler.scheduleAsyncRepeatingTask(StoaPlugin.getInst(), FAVOR, 20, (StoaPlugin.config().getInt("regeneration_rates.favor") * 20));
         MessageUtil.sendDebug("Favor regeneration runnable enabled...");
-
-        // Start saving runnable TODO Should we move this?
-        scheduler.scheduleAsyncRepeatingTask(StoaPlugin.getInst(), SAVE, 20, (Configs.getSettingInt("saving.freq") * 20));
 
         // Enable Deity runnables
         for (Deity deity : Stoa.getMythos().getDeities())
@@ -88,11 +76,11 @@ public class TaskManager {
                     scheduler.scheduleSyncRepeatingTask(StoaPlugin.getInst(), ability.getRunnable(), ability.getDelay(), ability.getRepeat());
 
         // Triggers
-        Threads.registerSyncAsyncRunnables(StoaPlugin.getInst(), Stoa.getMythos().getSyncAsyncTasks());
+        ThreadUtil.registerSyncAsyncRunnables(StoaPlugin.getInst(), Stoa.getMythos().getSyncAsyncTasks());
     }
 
     public static void stopThreads() {
         StoaPlugin.getInst().getServer().getScheduler().cancelTasks(StoaPlugin.getInst());
-        Threads.stopHooker(StoaPlugin.getInst());
+        ThreadUtil.stopHooker(StoaPlugin.getInst());
     }
 }

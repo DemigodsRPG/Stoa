@@ -1,8 +1,6 @@
 package com.demigodsrpg.stoa.util;
 
-import com.censoredsoftware.library.util.WorldGuards;
 import com.demigodsrpg.stoa.StoaPlugin;
-import com.demigodsrpg.stoa.entity.player.StoaCharacter;
 import com.demigodsrpg.stoa.listener.ZoneListener;
 import com.demigodsrpg.stoa.model.StructureModel;
 import com.google.common.base.Predicate;
@@ -35,9 +33,7 @@ public class ZoneUtil {
         Bukkit.getPluginManager().registerEvents(new ZoneListener(), StoaPlugin.getInst());
 
         // Init WorldGuard stuff
-        WorldGuards.createFlag("STATE", "demigods", true, "ALL");
-        WorldGuards.registerCreatedFlag("demigods");
-        WorldGuards.setWhenToOverridePVP(StoaPlugin.getInst(), new Predicate<EntityDamageByEntityEvent>() {
+        WorldGuardUtil.setWhenToOverridePVP(StoaPlugin.getInst(), new Predicate<EntityDamageByEntityEvent>() {
             @Override
             public boolean apply(EntityDamageByEntityEvent event) {
                 return !inNoStoaZone(event.getEntity().getLocation());
@@ -55,8 +51,8 @@ public class ZoneUtil {
      */
     public static boolean inNoPvpZone(Location location) {
         if (PLUGIN_CONFIG.getBoolean("zones.allow_skills_anywhere")) return false;
-        if (WorldGuards.worldGuardEnabled())
-            return StructureUtil.isInRadiusWithFlag(location, StructureModel.Flag.NO_PVP) || !WorldGuards.canPVP(location);
+        if (WorldGuardUtil.worldGuardEnabled())
+            return StructureUtil.isInRadiusWithFlag(location, StructureModel.Flag.NO_PVP) || !WorldGuardUtil.canPVP(location);
         return StructureUtil.isInRadiusWithFlag(location, StructureModel.Flag.NO_PVP);
     }
 
@@ -69,9 +65,9 @@ public class ZoneUtil {
      * @return true/false depending on the position of the <code>player</code>.
      */
     public static boolean inNoBuildZone(Player player, Location location) {
-        if (WorldGuards.worldGuardEnabled() && !WorldGuards.canBuild(player, location)) return true;
+        if (WorldGuardUtil.worldGuardEnabled() && !WorldGuardUtil.canBuild(player, location)) return true;
         StructureModel save = Iterables.getFirst(StructureUtil.getInRadiusWithFlag(location, StructureModel.Flag.NO_GRIEFING), null);
-        return StoaCharacter.of(player) != null && save != null && !CharacterUtil.currentFromPlayer(player).uuid.equals(save.getOwnerId());
+        return CharacterUtil.currentFromPlayer(player) != null && save != null && !CharacterUtil.currentFromPlayer(player).uuid.equals(save.getOwnerId());
     }
 
     public static boolean inNoStoaZone(Location location) {

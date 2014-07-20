@@ -1,8 +1,8 @@
 package com.demigodsrpg.stoa.mythos;
 
 import com.censoredsoftware.library.command.CommandManager;
-import com.censoredsoftware.library.data.thread.SyncAsyncRunnable;
 import com.demigodsrpg.stoa.StoaPlugin;
+import com.demigodsrpg.stoa.data.thread.SyncAsyncRunnable;
 import com.demigodsrpg.stoa.deity.Alliance;
 import com.demigodsrpg.stoa.deity.Deity;
 import com.demigodsrpg.stoa.item.DivineItem;

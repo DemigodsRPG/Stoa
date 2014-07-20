@@ -16,8 +16,8 @@
 
 package com.demigodsrpg.stoa.schematic;
 
-public class StoaMaterialDataException extends IllegalArgumentException {
-    public StoaMaterialDataException() {
+public class PotentialMaterialException extends IllegalArgumentException {
+    public PotentialMaterialException() {
         super("Odds must be between 1 and 100.");
     }
 }

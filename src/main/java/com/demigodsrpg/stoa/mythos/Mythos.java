@@ -1,12 +1,12 @@
 package com.demigodsrpg.stoa.mythos;
 
 import com.censoredsoftware.library.command.CommandManager;
-import com.censoredsoftware.library.data.thread.SyncAsyncRunnable;
-import com.censoredsoftware.library.util.Items;
+import com.demigodsrpg.stoa.data.thread.SyncAsyncRunnable;
 import com.demigodsrpg.stoa.deity.Alliance;
 import com.demigodsrpg.stoa.deity.Deity;
 import com.demigodsrpg.stoa.item.DivineItem;
 import com.demigodsrpg.stoa.model.StructureModel;
+import com.demigodsrpg.stoa.util.ItemUtil;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.Iterables;
@@ -85,7 +85,7 @@ public interface Mythos {
                 return Iterables.find(mythos.getDivineItems(), new Predicate<DivineItem>() {
                     @Override
                     public boolean apply(DivineItem foundItem) {
-                        return Items.areEqualIgnoreEnchantments(foundItem.getItem(), itemStack);
+                        return ItemUtil.areEqualIgnoreEnchantments(foundItem.getItem(), itemStack);
                     }
                 });
             } catch (NoSuchElementException ignored) {

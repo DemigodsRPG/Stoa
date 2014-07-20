@@ -1,13 +1,13 @@
 package com.demigodsrpg.stoa;
 
-import com.demigodsrpg.stoa.data.TaskManager;
+import com.demigodsrpg.stoa.data.thread.TaskManager;
 import com.demigodsrpg.stoa.deity.Ability;
 import com.demigodsrpg.stoa.deity.Alliance;
 import com.demigodsrpg.stoa.deity.Deity;
-import com.demigodsrpg.stoa.entity.player.attribute.Skill;
 import com.demigodsrpg.stoa.item.DivineItem;
 import com.demigodsrpg.stoa.model.CharacterModel;
 import com.demigodsrpg.stoa.model.PlayerModel;
+import com.demigodsrpg.stoa.model.SkillModel;
 import com.demigodsrpg.stoa.model.StructureModel;
 import com.demigodsrpg.stoa.mythos.Mythos;
 import com.demigodsrpg.stoa.mythos.MythosSet;
@@ -105,9 +105,6 @@ public class StoaServer {
             if (isRunningSpigot()) {
                 MessageUtil.info(("Spigot found, extra API features enabled."));
             } else MessageUtil.warning(("Without Spigot, some features may not work."));
-
-            // Clean skills
-            SkillUtil.cleanSkills();
 
             return true;
         } catch (Exception errored) {
@@ -224,7 +221,7 @@ public class StoaServer {
         }
 
         // Skill types
-        for (Skill.Type skill : Skill.Type.values())
+        for (SkillModel.Type skill : SkillModel.Type.values())
             registerPermission(register, skill.getPermission(), load);
     }
 

@@ -1,6 +1,5 @@
 package com.demigodsrpg.stoa.model;
 
-import com.censoredsoftware.library.messages.CommonSymbol;
 import com.demigodsrpg.stoa.Stoa;
 import com.demigodsrpg.stoa.StoaPlugin;
 import com.demigodsrpg.stoa.StoaServer;
@@ -8,17 +7,14 @@ import com.demigodsrpg.stoa.battle.Participant;
 import com.demigodsrpg.stoa.deity.Ability;
 import com.demigodsrpg.stoa.deity.Alliance;
 import com.demigodsrpg.stoa.deity.Deity;
-import com.demigodsrpg.stoa.entity.StoaTameable;
 import com.demigodsrpg.stoa.event.StoaChatEvent;
+import com.demigodsrpg.stoa.language.CommonSymbol;
 import com.demigodsrpg.stoa.util.*;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.iciql.Db;
 import com.iciql.Iciql;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.PlayerInventory;
@@ -26,7 +22,6 @@ import org.bukkit.potion.PotionEffect;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Iciql.IQTable(name = "dg_characters")
@@ -259,6 +254,14 @@ public class CharacterModel implements Participant {
         return skillPoints;
     }
 
+    public void addSkillPoints(Integer add) {
+        skillPoints += add;
+    }
+
+    public void minusSkillPoints(Integer minus) {
+        skillPoints -= minus;
+    }
+
     public void setSkillPoints(Integer skillPoints) {
         this.skillPoints = skillPoints;
     }
@@ -272,11 +275,11 @@ public class CharacterModel implements Participant {
     }
 
     public PlayerInventoryModel getInventory() {
-        return InventoryUtil.playerInvFromOwnerId(uuid);
+        return ItemUtil.playerInvFromOwnerId(uuid);
     }
 
     public EnderChestInventoryModel getEnderInventory() {
-        return InventoryUtil.enderInvFromOwnerId(uuid);
+        return ItemUtil.enderInvFromOwnerId(uuid);
     }
 
     public Location getLastLocation() {
@@ -295,14 +298,35 @@ public class CharacterModel implements Participant {
         this.bedSpawn = LocationUtil.stringFromLocation(bedSpawn);
     }
 
-    public Set<PotionEffect> getPotionEffects() {
-        // TODO
-        return null;
+    public void setPotionEffects(Collection<PotionEffect> effects) {
+        PotionEffectModel alias = new PotionEffectModel();
+        Db db = StoaServer.openDb();
+        PotionEffectModel model = db.from(alias).where(alias.id).is(uuid).selectFirst();
+        if (model != null) {
+            db.delete(model);
+        }
+        model = new PotionEffectModel(uuid, effects);
+        db.insert(model);
+        db.close();
+    }
+
+    public List<PotionEffect> getPotionEffects() {
+        PotionEffectModel alias = new PotionEffectModel();
+        Db db = StoaServer.openDb();
+        try {
+            return db.from(alias).where(alias.id).is(uuid).selectFirst().getPotionEffects();
+        } finally {
+            db.close();
+        }
     }
 
     public Collection<Deity> getMinorDeities() {
         // TODO
         return null;
+    }
+
+    public boolean isDeity(String name) {
+        return deity.equals(name);
     }
 
     public Deity getDeity() {
@@ -340,7 +364,7 @@ public class CharacterModel implements Participant {
         Db db = StoaServer.openDb();
         SkillModel found = Iterables.getFirst(db.from(alias).where(alias.type).is(SkillModel.Type.FAVOR_REGEN).and(alias.characterId).is(uuid).select(), null);
         int favorRegenSkill = found != null ? 4 * found.level : 0;
-        int regenRate = (int) Math.ceil(StoaPlugin.getInst().getConfig().getDouble("multipliers.favor") * (getDeity().getFavorRegen() + favorRegenSkill));
+        int regenRate = (int) Math.ceil(StoaPlugin.getInst().config().getDouble("multipliers.favor") * (getDeity().getFavorRegen() + favorRegenSkill));
         if (regenRate < 30) regenRate = 30;
         return regenRate;
     }
@@ -384,8 +408,8 @@ public class CharacterModel implements Participant {
         return getAlliance().equals(participant.getCharacter().getAlliance());
     }
 
-    public Collection<StoaTameable> getPets() {
-        return StoaTameable.findByOwner(uuid);
+    public Collection<TameableModel> getPets() {
+        return TameableUtil.findByOwner(uuid);
     }
 
     public void remove() {
@@ -482,7 +506,7 @@ public class CharacterModel implements Participant {
         player.setLevel(level);
         for (PotionEffect potion : player.getActivePotionEffects())
             player.removePotionEffect(potion.getType());
-        Set<PotionEffect> potionEffects = getPotionEffects();
+        List<PotionEffect> potionEffects = getPotionEffects();
         if (!potionEffects.isEmpty()) player.addPotionEffects(potionEffects);
         /*
         Bukkit.getScheduler().scheduleSyncDelayedTask(StoaPlugin.getInst(), new BukkitRunnable()
@@ -508,6 +532,11 @@ public class CharacterModel implements Participant {
     @Override
     public CharacterModel getCharacter() {
         return this;
+    }
+
+    @Override
+    public OfflinePlayer getOfflinePlayer() {
+        return Bukkit.getOfflinePlayer(UUID.fromString(playerId));
     }
 
     @Override

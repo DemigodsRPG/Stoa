@@ -7,28 +7,28 @@ import java.sql.Timestamp;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-@Iciql.IQTable(name = "notifications")
-public class NotificationModel implements Battle {
+@Iciql.IQTable(name = "dg_notifications")
+public class NotificationModel {
     // -- DEFAULT CONSTRUCTOR -- //
     public NotificationModel() {
     }
 
-    // -- PRACTICAL STATIC CONSTRUCTOR -- //
-    public static NotificationModel from(Alert alert, SenderType type, CharacterModel receiver, String name, String message, Optional<String> sender, Optional<Long> time, Optional<TimeUnit> unit) {
-        NotificationModel model = new NotificationModel();
-
+    // -- PRACTICAL CONSTRUCTOR -- //
+    public NotificationModel(Alert alert, SenderType type, CharacterModel receiver, String name, String message, Optional<String> sender, Optional<Long> time, Optional<TimeUnit> unit) {
         // Set data
-        model.alert = alert;
-        model.type = type;
-        model.name = name;
-        model.message = message;
-        if (time.isPresent() && unit.isPresent()) model.expiration = new Timestamp(unit.get().toMillis(time.get()));
+        this.alert = alert;
+        this.type = type;
+        this.name = name;
+        this.message = message;
+        if (time.isPresent() && unit.isPresent()) {
+            expiration = new Timestamp(unit.get().toMillis(time.get()));
+        }
 
         // Foreign keys
-        model.receiverId = receiver.uuid;
-        if (sender.isPresent()) model.senderId = sender.get();
-
-        return model;
+        receiverId = receiver.uuid;
+        if (sender.isPresent()) {
+            senderId = sender.get();
+        }
     }
 
     // -- MODEL META -- //
@@ -63,15 +63,4 @@ public class NotificationModel implements Battle {
     public String senderId;
     @Iciql.IQColumn
     public String receiverId;
-
-    // -- INTERFACE METHODS -- //
-    @Override
-    public String id() {
-        return id;
-    }
-
-    @Override
-    public String modelName() {
-        return "NOTIFICATION";
-    }
 }

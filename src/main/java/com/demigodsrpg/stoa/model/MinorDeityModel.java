@@ -1,5 +1,5 @@
 package com.demigodsrpg.stoa.model;
 
-public class MinorDeityModel
-{
+public class MinorDeityModel {
+    // TODO
 }

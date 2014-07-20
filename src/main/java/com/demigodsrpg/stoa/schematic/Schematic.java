@@ -24,7 +24,7 @@ import org.bukkit.entity.Item;
 import java.util.ArrayList;
 import java.util.Set;
 
-public class Schematic extends ArrayList<StoaSelection> {
+public class Schematic extends ArrayList<Selection> {
     private final String name;
     private final String designer;
     private int radius;
@@ -45,7 +45,7 @@ public class Schematic extends ArrayList<StoaSelection> {
 
     public Set<Location> getLocations(Location reference) {
         Set<Location> locations = Sets.newHashSet();
-        for (StoaSelection cuboid : this)
+        for (Selection cuboid : this)
             locations.addAll(cuboid.getBlockLocations(reference));
         return locations;
     }
@@ -55,7 +55,7 @@ public class Schematic extends ArrayList<StoaSelection> {
     }
 
     public void generate(final Location reference) {
-        for (StoaSelection cuboid : this) {
+        for (Selection cuboid : this) {
             cuboid.generate(reference);
         }
 

@@ -25,13 +25,13 @@ import org.bukkit.Material;
 import java.util.*;
 
 @SuppressWarnings("deprecation")
-public class StoaSelection {
+public class Selection {
     private int X, Y, Z, XX, YY, ZZ;
     private int eX, eY, eZ, eXX, eYY, eZZ;
     private boolean cuboid;
     private boolean exclude;
     private boolean excludeSelection;
-    private List<StoaMaterialData> blockData;
+    private List<PotentialMaterial> blockData;
 
     /**
      * Constructor for a Selection (non-cuboid), useful for getting 1 location back.
@@ -40,7 +40,7 @@ public class StoaSelection {
      * @param Y The relative Y coordinate of the schematic from the reference location.
      * @param Z The relative Z coordinate of the schematic from the reference location.
      */
-    public StoaSelection(int X, int Y, int Z) {
+    public Selection(int X, int Y, int Z) {
         this.X = this.XX = X;
         this.Y = this.YY = Y;
         this.Z = this.ZZ = Z;
@@ -60,7 +60,7 @@ public class StoaSelection {
      * @param YY The second relative Y coordinate of the schematic from the reference location, creating a cuboid.
      * @param ZZ The second relative Z coordinate of the schematic from the reference location, creating a cuboid.
      */
-    public StoaSelection(int X, int Y, int Z, int XX, int YY, int ZZ) {
+    public Selection(int X, int Y, int Z, int XX, int YY, int ZZ) {
         this.X = X;
         this.Y = Y;
         this.Z = Z;
@@ -81,14 +81,14 @@ public class StoaSelection {
      * @param Z        The relative Z coordinate of the schematic from the reference location.
      * @param material The StoaMaterialData objects of this schematic.
      */
-    public StoaSelection(int X, int Y, int Z, Material material) {
+    public Selection(int X, int Y, int Z, Material material) {
         this.X = this.XX = X;
         this.Y = this.YY = Y;
         this.Z = this.ZZ = Z;
         this.cuboid = false;
         this.exclude = false;
         this.excludeSelection = false;
-        this.blockData = Lists.newArrayList(new StoaMaterialData(material));
+        this.blockData = Lists.newArrayList(new PotentialMaterial(material));
     }
 
     /**
@@ -102,7 +102,7 @@ public class StoaSelection {
      * @param ZZ       The second relative Z coordinate of the schematic from the reference location, creating a cuboid.
      * @param material The StoaMaterialData objects of this schematic.
      */
-    public StoaSelection(int X, int Y, int Z, int XX, int YY, int ZZ, Material material) {
+    public Selection(int X, int Y, int Z, int XX, int YY, int ZZ, Material material) {
         this.X = X;
         this.Y = Y;
         this.Z = Z;
@@ -112,7 +112,7 @@ public class StoaSelection {
         this.cuboid = true;
         this.exclude = false;
         this.excludeSelection = false;
-        this.blockData = Lists.newArrayList(new StoaMaterialData(material));
+        this.blockData = Lists.newArrayList(new PotentialMaterial(material));
     }
 
     /**
@@ -123,14 +123,14 @@ public class StoaSelection {
      * @param Z        The relative Z coordinate of the schematic from the reference location.
      * @param material The StoaMaterialData objects of this schematic.
      */
-    public StoaSelection(int X, int Y, int Z, Material material, byte data) {
+    public Selection(int X, int Y, int Z, Material material, byte data) {
         this.X = this.XX = X;
         this.Y = this.YY = Y;
         this.Z = this.ZZ = Z;
         this.cuboid = false;
         this.exclude = false;
         this.excludeSelection = false;
-        this.blockData = Lists.newArrayList(new StoaMaterialData(material, data));
+        this.blockData = Lists.newArrayList(new PotentialMaterial(material, data));
     }
 
     /**
@@ -144,7 +144,7 @@ public class StoaSelection {
      * @param ZZ       The second relative Z coordinate of the schematic from the reference location, creating a cuboid.
      * @param material The StoaMaterialData objects of this schematic.
      */
-    public StoaSelection(int X, int Y, int Z, int XX, int YY, int ZZ, Material material, byte data) {
+    public Selection(int X, int Y, int Z, int XX, int YY, int ZZ, Material material, byte data) {
         this.X = X;
         this.Y = Y;
         this.Z = Z;
@@ -154,7 +154,7 @@ public class StoaSelection {
         this.cuboid = true;
         this.exclude = false;
         this.excludeSelection = false;
-        this.blockData = Lists.newArrayList(new StoaMaterialData(material, data));
+        this.blockData = Lists.newArrayList(new PotentialMaterial(material, data));
     }
 
     /**
@@ -165,7 +165,7 @@ public class StoaSelection {
      * @param Z         The relative Z coordinate of the schematic from the reference location.
      * @param blockData The StoaMaterialData objects of this schematic.
      */
-    public StoaSelection(int X, int Y, int Z, StoaMaterialData blockData) {
+    public Selection(int X, int Y, int Z, PotentialMaterial blockData) {
         this.X = this.XX = X;
         this.Y = this.YY = Y;
         this.Z = this.ZZ = Z;
@@ -186,7 +186,7 @@ public class StoaSelection {
      * @param ZZ        The second relative Z coordinate of the schematic from the reference location, creating a cuboid.
      * @param blockData The StoaMaterialData objects of this schematic.
      */
-    public StoaSelection(int X, int Y, int Z, int XX, int YY, int ZZ, StoaMaterialData blockData) {
+    public Selection(int X, int Y, int Z, int XX, int YY, int ZZ, PotentialMaterial blockData) {
         this.X = X;
         this.Y = Y;
         this.Z = Z;
@@ -207,7 +207,7 @@ public class StoaSelection {
      * @param Z         The relative Z coordinate of the schematic from the reference location.
      * @param blockData The StoaMaterialData objects of this schematic.
      */
-    public StoaSelection(int X, int Y, int Z, List<StoaMaterialData> blockData) {
+    public Selection(int X, int Y, int Z, List<PotentialMaterial> blockData) {
         this.X = this.XX = X;
         this.Y = this.YY = Y;
         this.Z = this.ZZ = Z;
@@ -228,7 +228,7 @@ public class StoaSelection {
      * @param ZZ        The second relative Z coordinate of the schematic from the reference location, creating a cuboid.
      * @param blockData The StoaMaterialData objects of this schematic.
      */
-    public StoaSelection(int X, int Y, int Z, int XX, int YY, int ZZ, List<StoaMaterialData> blockData) {
+    public Selection(int X, int Y, int Z, int XX, int YY, int ZZ, List<PotentialMaterial> blockData) {
         this.X = X;
         this.Y = Y;
         this.Z = Z;
@@ -249,7 +249,7 @@ public class StoaSelection {
      * @param Z        The relative Z coordinate of the schematic from the reference location.
      * @param material The StoaMaterialData objects of this schematic.
      */
-    public StoaSelection(int X, int Y, int Z, StoaMaterialData.Preset material) {
+    public Selection(int X, int Y, int Z, PotentialMaterial.Preset material) {
         this.X = this.XX = X;
         this.Y = this.YY = Y;
         this.Z = this.ZZ = Z;
@@ -270,7 +270,7 @@ public class StoaSelection {
      * @param ZZ       The second relative Z coordinate of the schematic from the reference location, creating a cuboid.
      * @param material The StoaMaterialData objects of this schematic.
      */
-    public StoaSelection(int X, int Y, int Z, int XX, int YY, int ZZ, StoaMaterialData.Preset material) {
+    public Selection(int X, int Y, int Z, int XX, int YY, int ZZ, PotentialMaterial.Preset material) {
         this.X = X;
         this.Y = Y;
         this.Z = Z;
@@ -291,7 +291,7 @@ public class StoaSelection {
      * @param Z The relative Z coordinate of the schematic from the reference location.
      * @return This schematic.
      */
-    public StoaSelection exclude(int X, int Y, int Z) {
+    public Selection exclude(int X, int Y, int Z) {
         this.eX = this.eXX = X;
         this.eY = this.eYY = Y;
         this.eZ = this.eZZ = Z;
@@ -310,7 +310,7 @@ public class StoaSelection {
      * @param ZZ The second relative Z coordinate of the schematic from the reference location, creating a cuboid.
      * @return This schematic.
      */
-    public StoaSelection exclude(int X, int Y, int Z, int XX, int YY, int ZZ) {
+    public Selection exclude(int X, int Y, int Z, int XX, int YY, int ZZ) {
         this.eX = X;
         this.eY = Y;
         this.eZ = Z;
@@ -329,11 +329,11 @@ public class StoaSelection {
      *
      * @return A material.
      */
-    public StoaMaterialData getStructureStoaMaterialData() {
+    public PotentialMaterial getStructureStoaMaterialData() {
         final int roll = generateIntRange(1, 100);
-        Collection<StoaMaterialData> check = Collections2.filter(blockData, new Predicate<StoaMaterialData>() {
+        Collection<PotentialMaterial> check = Collections2.filter(blockData, new Predicate<PotentialMaterial>() {
             @Override
-            public boolean apply(StoaMaterialData blockData) {
+            public boolean apply(PotentialMaterial blockData) {
                 return blockData.getOdds() >= roll;
             }
         });
@@ -378,7 +378,7 @@ public class StoaSelection {
     public void generate(Location reference) {
         if (blockData.isEmpty()) return;
         for (Location location : getBlockLocations(reference)) {
-            StoaMaterialData data = getStructureStoaMaterialData();
+            PotentialMaterial data = getStructureStoaMaterialData();
             location.getBlock().setTypeIdAndData(data.getMaterial().getId(), data.getData(), data.getPhysics());
         }
     }
@@ -428,18 +428,18 @@ public class StoaSelection {
 
     @Override
     public boolean equals(Object object) {
-        return object instanceof StoaSelection && Objects.equal(this, object);
+        return object instanceof Selection && Objects.equal(this, object);
     }
 
     public String nonCuboidSingleStoaMaterialDataToString() {
         return X + "~and~" + Y + "~and~" + Z + "~and~" + blockData.get(0).getMaterial().name();
     }
 
-    public static StoaSelection nonCuboidSingleStoaMaterialDataFromString(String string) {
+    public static Selection nonCuboidSingleStoaMaterialDataFromString(String string) {
         try {
             String[] args = string.split("~and~");
             if (args.length != 4) return null;
-            return new StoaSelection(Integer.valueOf(args[0]), Integer.valueOf(args[1]), Integer.valueOf(args[2]), Material.valueOf(args[3]));
+            return new Selection(Integer.valueOf(args[0]), Integer.valueOf(args[1]), Integer.valueOf(args[2]), Material.valueOf(args[3]));
         } catch (Exception ignored) {
         }
         return null;
@@ -453,8 +453,8 @@ public class StoaSelection {
      * @param radius     Radius of cuboid.
      * @return List of Selections.
      */
-    public static List<StoaSelection> getCuboid(Location referenceA, Location referenceB, int radius) {
-        List<StoaSelection> selections = Lists.newArrayList();
+    public static List<Selection> getCuboid(Location referenceA, Location referenceB, int radius) {
+        List<Selection> selections = Lists.newArrayList();
         int X = referenceB.getBlockX() - radius, Y = referenceB.getBlockY() - radius, Z = referenceB.getBlockZ() - radius, XX = referenceB.getBlockX() + radius, YY = referenceB.getBlockY() + radius, ZZ = referenceB.getBlockZ() + radius;
         int differenceX = referenceB.getBlockX() - referenceA.getBlockX();
         int differenceY = referenceB.getBlockY() - referenceA.getBlockY();
@@ -462,7 +462,7 @@ public class StoaSelection {
         for (int x : Ranges.closed(X < XX ? X : XX, X < XX ? XX : X).asSet(DiscreteDomains.integers()))
             for (int y : Ranges.closed(Y < YY ? Y : YY, Y < YY ? YY : Y).asSet(DiscreteDomains.integers()))
                 for (int z : Ranges.closed(Z < ZZ ? Z : ZZ, Z < ZZ ? ZZ : Z).asSet(DiscreteDomains.integers()))
-                    selections.add(new StoaSelection(x + differenceX, y + differenceY, z + differenceZ, referenceA.getWorld().getBlockAt(x, y, z).getType()));
+                    selections.add(new Selection(x + differenceX, y + differenceY, z + differenceZ, referenceA.getWorld().getBlockAt(x, y, z).getType()));
         return selections;
     }
 }

@@ -1,18 +1,17 @@
 package com.demigodsrpg.stoa.deity.template;
 
-import com.censoredsoftware.library.data.yaml.SimpleYamlFile;
-import com.censoredsoftware.library.messages.CommonSymbol;
-import com.censoredsoftware.library.util.Strings;
-import com.demigodsrpg.stoa.StoaPlugin;
 import com.demigodsrpg.stoa.deity.Ability;
 import com.demigodsrpg.stoa.deity.Alliance;
 import com.demigodsrpg.stoa.deity.Deity;
-import com.google.common.base.Function;
-import com.google.common.collect.*;
+import com.demigodsrpg.stoa.language.CommonSymbol;
+import com.demigodsrpg.stoa.util.StringUtil2;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.material.MaterialData;
 import org.bukkit.permissions.PermissionDefault;
 
@@ -21,183 +20,156 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class TemplateDeity implements Deity
-{
-	public static String name = "Template", shortDescription = ChatColor.GRAY + "The deity of testing.";
-	public static Alliance alliance = new Alliance()
-	{
-		@Override
-		public String getName()
-		{
-			return "Test";
-		}
+public class TemplateDeity implements Deity {
+    public static String name = "Template", shortDescription = ChatColor.GRAY + "The deity of testing.";
+    public static Alliance alliance = new Alliance() {
+        @Override
+        public String getName() {
+            return "Test";
+        }
 
-		@Override
-		public String getShortDescription()
-		{
-			return "Test alliance.";
-		}
+        @Override
+        public String getShortDescription() {
+            return "Test alliance.";
+        }
 
-		@Override
-		public String getPermission()
-		{
-			return "demigods.alliance.test";
-		}
+        @Override
+        public String getPermission() {
+            return "demigods.alliance.test";
+        }
 
-		@Override
-		public PermissionDefault getPermissionDefault()
-		{
-			return PermissionDefault.FALSE;
-		}
+        @Override
+        public PermissionDefault getPermissionDefault() {
+            return PermissionDefault.FALSE;
+        }
 
-		@Override
-		public boolean isPlayable()
-		{
-			return false;
-		}
-	};
-	public static String permission = alliance.getPermission() + "." + name.toLowerCase();
-	public static PermissionDefault permissionDefault = PermissionDefault.FALSE;
-	public static int accuracy = 15, favorRegen = 5, maxFavor = 20000, favorBank = 10000;
-	public static double maxHealth = 40.0;
-	public static ChatColor color = ChatColor.GRAY;
-	public static Map<Material, Integer> claimItems = Maps.newHashMap(ImmutableMap.of(Material.BEDROCK, 1));
-	public static Map<Material, Integer> forsakeItems = Maps.newHashMap(ImmutableMap.of(Material.BEDROCK, 1));
-	public static List<String> lore = new ArrayList<String>(9 + claimItems.size())
-	{
-		{
-			add(" ");
-			add(ChatColor.AQUA + " Stoa > " + ChatColor.RESET + color + name);
-			add(ChatColor.RESET + "-----------------------------------------------------");
-			add(" ");
-			add(ChatColor.YELLOW + " Claim Items:");
-			add(" ");
-			for(Map.Entry<Material, Integer> entry : claimItems.entrySet())
-				add(ChatColor.GRAY + " " + CommonSymbol.RIGHTWARD_ARROW + " " + ChatColor.WHITE + entry.getValue() + " " + Strings.beautify(entry.getKey().name()).toLowerCase() + (entry.getValue() > 1 ? "s" : ""));
-			add(" ");
-			add(ChatColor.YELLOW + " Abilities:");
-			add(" ");
-		}
-	};
-	public static Set<Deity.Flag> flags = Sets.newHashSet(Deity.Flag.NON_PLAYABLE);
-	public static List<Ability> abilities = Lists.newArrayList((Ability) new TemplateAbility(name));
+        @Override
+        public boolean isPlayable() {
+            return false;
+        }
+    };
+    public static String permission = alliance.getPermission() + "." + name.toLowerCase();
+    public static PermissionDefault permissionDefault = PermissionDefault.FALSE;
+    public static int accuracy = 15, favorRegen = 5, maxFavor = 20000, favorBank = 10000;
+    public static double maxHealth = 40.0;
+    public static ChatColor color = ChatColor.GRAY;
+    public static Map<Material, Integer> claimItems = Maps.newHashMap(ImmutableMap.of(Material.BEDROCK, 1));
+    public static Map<Material, Integer> forsakeItems = Maps.newHashMap(ImmutableMap.of(Material.BEDROCK, 1));
+    public static List<String> lore = new ArrayList<String>(9 + claimItems.size()) {
+        {
+            add(" ");
+            add(ChatColor.AQUA + " Stoa > " + ChatColor.RESET + color + name);
+            add(ChatColor.RESET + "-----------------------------------------------------");
+            add(" ");
+            add(ChatColor.YELLOW + " Claim Items:");
+            add(" ");
+            for (Map.Entry<Material, Integer> entry : claimItems.entrySet())
+                add(ChatColor.GRAY + " " + CommonSymbol.RIGHTWARD_ARROW + " " + ChatColor.WHITE + entry.getValue() + " " + StringUtil2.beautify(entry.getKey().name()).toLowerCase() + (entry.getValue() > 1 ? "s" : ""));
+            add(" ");
+            add(ChatColor.YELLOW + " Abilities:");
+            add(" ");
+        }
+    };
+    public static Set<Deity.Flag> flags = Sets.newHashSet(Deity.Flag.NON_PLAYABLE);
+    public static List<Ability> abilities = Lists.newArrayList((Ability) new TemplateAbility(name));
 
-	@Override
-	public String getName()
-	{
-		return name;
-	}
+    @Override
+    public String getName() {
+        return name;
+    }
 
-	@Override
-	public Alliance getAlliance()
-	{
-		return alliance;
-	}
+    @Override
+    public Alliance getAlliance() {
+        return alliance;
+    }
 
-	@Override
-	public String getPermission()
-	{
-		return permission;
-	}
+    @Override
+    public String getPermission() {
+        return permission;
+    }
 
-	@Override
-	public PermissionDefault getPermissionDefault()
-	{
-		return permissionDefault;
-	}
+    @Override
+    public PermissionDefault getPermissionDefault() {
+        return permissionDefault;
+    }
 
-	@Override
-	public ChatColor getColor()
-	{
-		return color;
-	}
+    @Override
+    public ChatColor getColor() {
+        return color;
+    }
 
-	@Override
-	public MaterialData getMaterialData()
-	{
-		return null; // TODO
-	}
+    @Override
+    public MaterialData getMaterialData() {
+        return null; // TODO
+    }
 
-	@Override
-	public Sound getSound()
-	{
-		return null; // TODO
-	}
+    @Override
+    public Sound getSound() {
+        return null; // TODO
+    }
 
-	@Override
-	public Map<Material, Integer> getClaimItems()
-	{
-		return claimItems;
-	}
+    @Override
+    public Map<Material, Integer> getClaimItems() {
+        return claimItems;
+    }
 
-	@Override
-	public Map<Material, Integer> getForsakeItems()
-	{
-		return forsakeItems;
-	}
+    @Override
+    public Map<Material, Integer> getForsakeItems() {
+        return forsakeItems;
+    }
 
-	@Override
-	public String getShortDescription()
-	{
-		return shortDescription;
-	}
+    @Override
+    public String getShortDescription() {
+        return shortDescription;
+    }
 
-	@Override
-	public List<String> getLore()
-	{
-		return lore;
-	}
+    @Override
+    public List<String> getLore() {
+        return lore;
+    }
 
-	@Override
-	public Set<Flag> getFlags()
-	{
-		return flags;
-	}
+    @Override
+    public Set<Flag> getFlags() {
+        return flags;
+    }
 
-	@Override
-	public List<Ability> getAbilities()
-	{
-		return abilities;
-	}
+    @Override
+    public List<Ability> getAbilities() {
+        return abilities;
+    }
 
-	@Override
-	public int getAccuracy()
-	{
-		return accuracy;
-	}
+    @Override
+    public int getAccuracy() {
+        return accuracy;
+    }
 
-	@Override
-	public int getFavorRegen()
-	{
-		return favorRegen;
-	}
+    @Override
+    public int getFavorRegen() {
+        return favorRegen;
+    }
 
-	@Override
-	public int getMaxFavor()
-	{
-		return maxFavor;
-	}
+    @Override
+    public int getMaxFavor() {
+        return maxFavor;
+    }
 
-	@Override
-	public double getMaxHealth()
-	{
-		return maxHealth;
-	}
+    @Override
+    public double getMaxHealth() {
+        return maxHealth;
+    }
 
-	@Override
-	public int getFavorBank()
-	{
-		return favorBank;
-	}
+    @Override
+    public int getFavorBank() {
+        return favorBank;
+    }
 
-	@Override
-	public void updateMood()
-	{
-		// TODO
-	}
+    @Override
+    public void updateMood() {
+        // TODO
+    }
 
-	@Override
-	public SimpleYamlFile getConfig()
+	/* @Override
+    public SimpleYamlFile getConfig()
 	{
 		return new SimpleYamlFile()
 		{
@@ -303,5 +275,5 @@ public class TemplateDeity implements Deity
 				}));
 			}
 		};
-	}
+	} */
 }
