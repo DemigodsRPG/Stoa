@@ -37,8 +37,6 @@ public class PlayerModel implements Participant {
         canPvp = false;
         characterSlots = StoaPlugin.config().getInt("character.default_character_slots");
         lastLoginTime = new Timestamp(System.currentTimeMillis());
-
-        // Don't set character, inventory, or last logout time data yet
     }
 
     // -- MODEL META -- //

@@ -54,8 +54,6 @@ public class CharacterModel implements Participant {
 
         // Foreign Keys
         playerId = player.mojangAccount;
-
-        // Don't set inventories or locations yet
     }
 
     // -- MODEL META -- //
@@ -94,12 +92,6 @@ public class CharacterModel implements Participant {
     public Integer maxFavor;
     @Iciql.IQColumn(name = "skill_points")
     public Integer skillPoints;
-
-    // private Set<UUID> notifications;
-    // private Map<String, UUID> binds;
-    // private Map<String, UUID> skillData;
-    // private Map<String, UUID> warps;
-    // private Map<String, UUID> invites;
 
     // -- FOREIGN DATA -- //
     @Iciql.IQColumn(nullable = false, name = "player_id")
