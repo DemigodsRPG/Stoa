@@ -8,7 +8,7 @@ import com.iciql.Iciql;
 import org.bukkit.inventory.ItemStack;
 
 @Iciql.IQTable(name = "dg_hotbarslots")
-public class HotbarSlotModelaa {
+public class HotbarSlotModel {
     @Iciql.IQColumn(primaryKey = true, autoIncrement = true)
     public Long id;
     @Iciql.IQColumn(name = "character_id")
