@@ -3,9 +3,9 @@ package com.demigodsrpg.stoa.listener;
 import com.demigodsrpg.stoa.Stoa;
 import com.demigodsrpg.stoa.StoaServer;
 import com.demigodsrpg.stoa.item.DivineItem;
-import com.demigodsrpg.stoa.model.HotbarSlotModel;
+import com.demigodsrpg.stoa.model.HotbarSlotModelaa;
 import com.demigodsrpg.stoa.util.CharacterUtil;
-import com.demigodsrpg.stoa.util.HotbarUtil;
+import com.demigodsrpg.stoa.util.HotbarUtilaa;
 import com.demigodsrpg.stoa.util.PlayerUtil;
 import com.demigodsrpg.stoa.util.ZoneUtil;
 import com.iciql.Db;
@@ -27,8 +27,8 @@ public class HotbarListener implements Listener {
         Player player = event.getPlayer();
         if (PlayerUtil.fromPlayer(player).hasCharacter() && !ZoneUtil.inNoStoaZone(player.getLocation())) {
             int slot = player.getInventory().getHeldItemSlot();
-            if (HotbarUtil.isBound(player, slot) && !HotbarUtil.canMove(player, slot)) {
-                HotbarSlotModel bound = HotbarUtil.getBound(player, slot);
+            if (HotbarUtilaa.isBound(player, slot) && !HotbarUtilaa.canMove(player, slot)) {
+                HotbarSlotModelaa bound = HotbarUtilaa.getBound(player, slot);
                 if (DivineItem.Type.ABILITY.equals(bound.getType())) {
                     event.setCancelled(true);
                 }
@@ -56,7 +56,7 @@ public class HotbarListener implements Listener {
         Player player = (Player) event.getWhoClicked();
         if (PlayerUtil.fromPlayer(player).hasCharacter() && !ZoneUtil.inNoStoaZone(player.getLocation())) {
             if (InventoryType.SlotType.QUICKBAR.equals(event.getSlotType())) {
-                if (HotbarUtil.isBound(player, event.getSlot()) && !HotbarUtil.canMove(player, event.getSlot())) {
+                if (HotbarUtilaa.isBound(player, event.getSlot()) && !HotbarUtilaa.canMove(player, event.getSlot())) {
                     event.setCancelled(true);
                     switch (event.getClick()) {
                         case LEFT:
@@ -71,7 +71,7 @@ public class HotbarListener implements Listener {
                     DivineItem item = Stoa.getItemRegistry().getDivineItemType(event.getCurrentItem(), DivineItem.Type.PASSIVE, DivineItem.Type.CONSUMABLE);
                     if (item != null) {
                         Db db = StoaServer.openDb();
-                        HotbarSlotModel model = new HotbarSlotModel();
+                        HotbarSlotModelaa model = new HotbarSlotModelaa();
                         model.slot = event.getSlot();
                         model.itemId = item.getId();
                         model.type = item.getType();
@@ -92,9 +92,9 @@ public class HotbarListener implements Listener {
                 case RIGHT_CLICK_BLOCK:
                 case RIGHT_CLICK_AIR:
                     int slot = player.getInventory().getHeldItemSlot();
-                    if (HotbarUtil.isBound(player, slot)) {
+                    if (HotbarUtilaa.isBound(player, slot)) {
                         event.setCancelled(true);
-                        HotbarSlotModel model = HotbarUtil.getBound(player, slot);
+                        HotbarSlotModelaa model = HotbarUtilaa.getBound(player, slot);
                         if (model.use()) {
                             Db db = StoaServer.openDb();
                             model.useCount++;
