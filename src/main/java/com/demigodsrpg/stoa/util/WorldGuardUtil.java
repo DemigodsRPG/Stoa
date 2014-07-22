@@ -44,11 +44,9 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class WorldGuardUtil implements Listener {
     private static boolean ENABLED;
-    private static Plugin plugin;
     private static ConcurrentMap<String, ProtoPVPListener> protoPVPListeners = Maps.newConcurrentMap();
 
     public WorldGuardUtil(final Plugin plugin) {
-        WorldGuardUtil.plugin = plugin;
         final WorldGuardUtil th = this;
         try {
             ENABLED = Bukkit.getPluginManager().getPlugin("WorldGuard") instanceof WorldGuardPlugin;

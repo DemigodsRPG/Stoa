@@ -5,6 +5,7 @@ import com.demigodsrpg.stoa.deity.Ability;
 import com.demigodsrpg.stoa.deity.Alliance;
 import com.demigodsrpg.stoa.deity.Deity;
 import com.demigodsrpg.stoa.item.DivineItem;
+import com.demigodsrpg.stoa.item.ItemRegistry;
 import com.demigodsrpg.stoa.model.CharacterModel;
 import com.demigodsrpg.stoa.model.PlayerModel;
 import com.demigodsrpg.stoa.model.SkillModel;
@@ -36,13 +37,19 @@ import java.util.*;
 public class StoaServer {
     // Mythos
     private final Mythos mythos;
+    private final ItemRegistry registry;
 
     StoaServer() {
         mythos = loadMythos();
+        registry = loadRegistry();
     }
 
     public Mythos getMythos() {
         return mythos;
+    }
+
+    public ItemRegistry getItemRegistry() {
+        return registry;
     }
 
     // Load everything else.
@@ -152,6 +159,14 @@ public class StoaServer {
         return null;
     }
 
+    protected ItemRegistry loadRegistry() {
+        ItemRegistry registry = new ItemRegistry();
+        for (DivineItem item : mythos.getDivineItems()) {
+            registry.addItem(item);
+        }
+        return registry;
+    }
+
     protected int loadWorlds() {
         return ZoneUtil.init();
     }
@@ -179,13 +194,8 @@ public class StoaServer {
 
         // Divine Items
         for (DivineItem divineItem : getMythos().getDivineItems()) {
-            if (divineItem.getUniqueListener() != null)
-                register.registerEvents(divineItem.getUniqueListener(), StoaPlugin.getInst());
             if (divineItem.getRecipe() != null) StoaPlugin.getInst().getServer().addRecipe(divineItem.getRecipe());
         }
-
-        // Quit reason.
-        // TODO Bukkit.getServer().getLogger().addHandler(new QuitReasonHandler());
     }
 
     protected void loadPermissions(final boolean load) {

@@ -1,36 +1,38 @@
 package com.demigodsrpg.stoa.item;
 
-import org.bukkit.event.Listener;
+import com.demigodsrpg.stoa.deity.Ability;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 
 import java.util.Set;
 
-public interface DivineItem
-{
-	@Override String toString();
+public interface DivineItem {
+    @Override
+    String toString();
 
-	String getName();
+    String getName();
 
-	String getDescription();
+    String getId();
 
-	Set<Flag> getFlags();
+    String getDescription();
 
-	Category getCategory();
+    Set<Flag> getFlags();
 
-	ItemStack getItem();
+    Type getType();
 
-	Recipe getRecipe();
+    ItemStack getItem();
 
-	Listener getUniqueListener();
+    Recipe getRecipe();
 
-	public enum Flag
-	{
-		UNENCHANTABLE
-	}
+    int getMaxUseCount();
 
-	public enum Category
-	{
-		ARMOR, WEAPON, CONSUMABLE, BOOK
-	}
+    Ability getAbility();
+
+    public enum Flag {
+        UNENCHANTABLE, MOVEABLE
+    }
+
+    public enum Type {
+        ABILITY, PASSIVE, CONSUMABLE
+    }
 }

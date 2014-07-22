@@ -4,7 +4,6 @@ import com.demigodsrpg.stoa.battle.Participant;
 import com.iciql.Iciql;
 
 import java.sql.Timestamp;
-import java.time.Instant;
 
 @Iciql.IQTable(name = "dg_deaths")
 public class DeathModel {
@@ -15,7 +14,7 @@ public class DeathModel {
     // -- PRACTICAL CONSTRUCTOR -- //
     public DeathModel(Participant victim) {
         // Set data and foreign keys
-        deathTime = Timestamp.from(Instant.now());
+        deathTime = new Timestamp(System.currentTimeMillis());
         victimId = victim.getCharacter().getId();
     }
 

@@ -356,7 +356,7 @@ public class CharacterModel implements Participant {
         Db db = StoaServer.openDb();
         SkillModel found = Iterables.getFirst(db.from(alias).where(alias.type).is(SkillModel.Type.FAVOR_REGEN).and(alias.characterId).is(uuid).select(), null);
         int favorRegenSkill = found != null ? 4 * found.level : 0;
-        int regenRate = (int) Math.ceil(StoaPlugin.getInst().config().getDouble("multipliers.favor") * (getDeity().getFavorRegen() + favorRegenSkill));
+        int regenRate = (int) Math.ceil(StoaPlugin.config().getDouble("multipliers.favor") * (getDeity().getFavorRegen() + favorRegenSkill));
         if (regenRate < 30) regenRate = 30;
         return regenRate;
     }

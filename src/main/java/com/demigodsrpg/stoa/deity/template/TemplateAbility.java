@@ -1,8 +1,8 @@
 package com.demigodsrpg.stoa.deity.template;
 
 import com.demigodsrpg.stoa.deity.Ability;
+import com.demigodsrpg.stoa.model.CharacterModel;
 import com.demigodsrpg.stoa.model.SkillModel;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -74,24 +74,19 @@ public class TemplateAbility implements Ability {
     }
 
     @Override
-    public Predicate<Player> getActionPredicate() {
-        return new Predicate<Player>() {
-            @Override
-            public boolean apply(Player player) {
-                // Define variables
-                LivingEntity target = Ability.Util.autoTarget(player);
+    public boolean use(CharacterModel model) {
+        // Define variables
+        LivingEntity target = Ability.Util.autoTarget(model.getEntity());
 
-                if (!Ability.Util.target(player, target.getLocation(), true)) return false;
+        if (!Ability.Util.target(model.getEntity(), target.getLocation(), true)) return false;
 
-                if (target instanceof Player) {
-                    Player victim = (Player) target;
-                    victim.sendMessage("Test!");
-                    player.sendMessage("Tested " + victim.getName() + "!");
-                }
+        if (target instanceof Player) {
+            Player victim = (Player) target;
+            victim.sendMessage("Test!");
+            model.getEntity().sendMessage("Tested " + victim.getName() + "!");
+        }
 
-                return true;
-            }
-        };
+        return true;
     }
 
     @Override

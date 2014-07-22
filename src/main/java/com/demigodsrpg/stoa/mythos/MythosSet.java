@@ -11,7 +11,6 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.*;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.Permission;
 
 import java.util.Collections;
@@ -22,9 +21,9 @@ public class MythosSet implements Mythos {
     private final ImmutableSet<Mythos> SET;
     private final String[] INCOMPATIBLE;
     private final ImmutableSet<DivineItem> DIVINE_ITEMS;
-    private final ImmutableSet<Alliance> ALLIANCES;
-    private final ImmutableSet<Deity> DEITIES;
-    private final ImmutableSet<StructureModel.Type> STRUCTURES;
+    private final ImmutableMap<String, Alliance> ALLIANCES;
+    private final ImmutableMap<String, Deity> DEITIES;
+    private final ImmutableMap<String, StructureModel.Type> STRUCTURES;
     private final ImmutableSet<Listener> LISTENERS;
     private final ImmutableSet<Permission> PERMISSIONS;
     private final ImmutableSet<CommandManager> COMMANDS;
@@ -75,9 +74,21 @@ public class MythosSet implements Mythos {
         INCOMPATIBLE = incompatibleWorking;
 
         DIVINE_ITEMS = ImmutableSet.copyOf(divineItems);
-        ALLIANCES = ImmutableSet.copyOf(alliance);
-        DEITIES = ImmutableSet.copyOf(deity);
-        STRUCTURES = ImmutableSet.copyOf(structureType);
+        ImmutableMap.Builder<String, Alliance> allianceBuilder = ImmutableMap.builder();
+        for (Alliance all : alliance) {
+            allianceBuilder.put(all.getName(), all);
+        }
+        ALLIANCES = allianceBuilder.build();
+        ImmutableMap.Builder<String, Deity> deityBuilder = ImmutableMap.builder();
+        for (Deity de : deity) {
+            deityBuilder.put(de.getName(), de);
+        }
+        DEITIES = deityBuilder.build();
+        ImmutableMap.Builder<String, StructureModel.Type> structBuilder = ImmutableMap.builder();
+        for (StructureModel.Type struct : structureType) {
+            structBuilder.put(struct.getName(), struct);
+        }
+        STRUCTURES = structBuilder.build();
         LISTENERS = ImmutableSet.copyOf(listener);
         PERMISSIONS = ImmutableSet.copyOf(permission);
         COMMANDS = ImmutableSet.copyOf(command);
@@ -125,48 +136,33 @@ public class MythosSet implements Mythos {
     }
 
     @Override
-    public DivineItem getDivineItem(String itemName) {
-        return Mythos.Util.getDivineItem(this, itemName);
-    }
-
-    @Override
-    public DivineItem getDivineItem(final ItemStack itemStack) {
-        return Mythos.Util.getDivineItem(this, itemStack);
-    }
-
-    @Override
-    public boolean itemHasFlag(ItemStack itemStack, DivineItem.Flag flag) {
-        return Mythos.Util.itemHasFlag(this, itemStack, flag);
-    }
-
-    @Override
     public ImmutableCollection<Alliance> getAlliances() {
-        return ALLIANCES;
+        return ALLIANCES.values();
     }
 
     @Override
     public Alliance getAlliance(final String allianceName) {
-        return Mythos.Util.getAlliance(this, allianceName);
+        return ALLIANCES.get(allianceName);
     }
 
     @Override
     public ImmutableCollection<Deity> getDeities() {
-        return DEITIES;
+        return DEITIES.values();
     }
 
     @Override
     public Deity getDeity(final String deityName) {
-        return Mythos.Util.getDeity(this, deityName);
+        return DEITIES.get(deityName);
     }
 
     @Override
     public ImmutableCollection<StructureModel.Type> getStructures() {
-        return STRUCTURES;
+        return STRUCTURES.values();
     }
 
     @Override
     public StructureModel.Type getStructure(final String structureName) {
-        return Mythos.Util.getStructure(this, structureName);
+        return STRUCTURES.get(structureName);
     }
 
     @Override

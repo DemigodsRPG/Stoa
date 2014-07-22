@@ -18,7 +18,6 @@ package com.demigodsrpg.stoa.schematic;
 
 import com.google.common.collect.Sets;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Item;
 
 import java.util.ArrayList;
@@ -57,11 +56,6 @@ public class Schematic extends ArrayList<Selection> {
     public void generate(final Location reference) {
         for (Selection cuboid : this) {
             cuboid.generate(reference);
-        }
-
-        for (Location location : getLocations(reference)) {
-            Block block = location.getBlock();
-
         }
 
         for (Item drop : reference.getWorld().getEntitiesByClass(Item.class)) {

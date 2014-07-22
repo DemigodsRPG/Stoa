@@ -270,7 +270,7 @@ public class Battle {
                 MessageUtil.broadcast(ChatColor.GRAY + "The " + ChatColor.YELLOW + "MVP" + (oneMVP ? "" : "s") + ChatColor.GRAY + " from this battle " + (oneMVP ? "is" : "are") + ":");
                 for (String mvpId : MVPs) {
                     CharacterModel mvp = CharacterUtil.fromId(mvpId);
-                    MessageUtil.broadcast(" " + ChatColor.DARK_GRAY + CommonSymbol.RIGHTWARD_ARROW + " " + mvp.getDeity().getColor() + mvp.getName() + ChatColor.GRAY + " / " + ChatColor.YELLOW + "Kills" + ChatColor.GRAY + ": " + kills.get(mvp.getId()) + " / " + ChatColor.YELLOW + "Deaths" + ChatColor.GRAY + ": " + deaths.get(mvp.getId()));
+                    MessageUtil.broadcast(" " + ChatColor.DARK_GRAY + CommonSymbol.RIGHTWARD_ARROW + " " + mvp.getDeity().getColor() + mvp.getName() + ChatColor.GRAY + " / " + ChatColor.YELLOW + "Kills" + ChatColor.GRAY + ": " + kills.get(mvp) + " / " + ChatColor.YELLOW + "Deaths" + ChatColor.GRAY + ": " + deaths.get(mvp));
                 }
             }
         }

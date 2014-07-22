@@ -18,7 +18,7 @@ public class SkillUtil {
             CharacterModel character = participant.getCharacter();
 
             // Define all variables used for skill point calculation
-            int mvpBonus = battle.getMVPs().contains(participant.getCharacter()) ? StoaPlugin.config().getInt("bonuses.mvp_skill_points") : 1;
+            int mvpBonus = battle.getMVPs().contains(participant.getCharacter().getId()) ? StoaPlugin.config().getInt("bonuses.mvp_skill_points") : 1;
             int kills = battle.getKills().get(participant);
             int deaths = battle.getDeaths().get(participant);
 

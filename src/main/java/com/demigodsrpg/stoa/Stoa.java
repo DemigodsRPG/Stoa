@@ -1,5 +1,6 @@
 package com.demigodsrpg.stoa;
 
+import com.demigodsrpg.stoa.item.ItemRegistry;
 import com.demigodsrpg.stoa.model.CharacterModel;
 import com.demigodsrpg.stoa.model.PlayerModel;
 import com.demigodsrpg.stoa.mythos.Mythos;
@@ -33,6 +34,10 @@ public class Stoa {
 
     public static Mythos getMythos() {
         return getServer().getMythos();
+    }
+
+    public static ItemRegistry getItemRegistry() {
+        return getServer().getItemRegistry();
     }
 
     // -- PASS UP DATA FROM STOA SERVER CLASS -- //

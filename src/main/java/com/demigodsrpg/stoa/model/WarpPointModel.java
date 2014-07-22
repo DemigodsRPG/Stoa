@@ -1,5 +1,7 @@
 package com.demigodsrpg.stoa.model;
 
-public class BindModel {
+public class WarpPointModel {
+
     // TODO
+
 }
