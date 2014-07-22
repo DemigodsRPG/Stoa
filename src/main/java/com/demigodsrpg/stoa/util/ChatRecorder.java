@@ -1,6 +1,5 @@
 package com.demigodsrpg.stoa.util;
 
-import com.censoredsoftware.library.util.Times;
 import com.demigodsrpg.stoa.StoaPlugin;
 import com.demigodsrpg.stoa.event.StoaChatEvent;
 import com.google.common.base.Function;
@@ -42,8 +41,8 @@ public class ChatRecorder
 			@Override
 			public String apply(Map.Entry<Long, String> entry)
 			{
-				return ChatColor.GRAY + "[" + Times.getTimeTagged(entry.getKey(), true) + " ago]" + entry.getValue();
-			}
+                return ChatColor.GRAY + "[" + TimeUtil.getTimeTagged(entry.getKey(), true) + " ago]" + entry.getValue();
+            }
 		}));
 	}
 

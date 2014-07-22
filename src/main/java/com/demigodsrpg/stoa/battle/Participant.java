@@ -1,20 +1,22 @@
 package com.demigodsrpg.stoa.battle;
 
-import com.demigodsrpg.stoa.entity.player.StoaCharacter;
+import com.demigodsrpg.stoa.model.CharacterModel;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.LivingEntity;
 
-import java.util.UUID;
+public interface Participant {
+    boolean canPvp();
 
-public interface Participant
-{
-	UUID getId();
+    Location getCurrentLocation();
 
-	boolean canPvp();
+    LivingEntity getEntity();
 
-	Location getCurrentLocation();
+    boolean hasCharacter();
 
-	StoaCharacter getRelatedCharacter();
+    String getId();
 
-	LivingEntity getEntity();
+    CharacterModel getCharacter();
+
+    OfflinePlayer getOfflinePlayer();
 }
