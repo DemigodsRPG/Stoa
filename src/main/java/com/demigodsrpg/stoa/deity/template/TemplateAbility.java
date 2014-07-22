@@ -1,13 +1,13 @@
 package com.demigodsrpg.stoa.deity.template;
 
 import com.demigodsrpg.stoa.deity.Ability;
+import com.demigodsrpg.stoa.item.DivineItem;
 import com.demigodsrpg.stoa.model.CharacterModel;
 import com.demigodsrpg.stoa.model.SkillModel;
 import com.google.common.collect.Lists;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
-import org.bukkit.material.MaterialData;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
@@ -64,13 +64,13 @@ public class TemplateAbility implements Ability {
     }
 
     @Override
-    public MaterialData getWeapon() {
+    public DivineItem getItem() {
         return null;
     }
 
     @Override
-    public boolean hasWeapon() {
-        return getWeapon() != null;
+    public boolean hasItem() {
+        return getItem() != null;
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.demigodsrpg.stoa.deity;
 import com.demigodsrpg.stoa.Stoa;
 import com.demigodsrpg.stoa.StoaPlugin;
 import com.demigodsrpg.stoa.battle.Participant;
+import com.demigodsrpg.stoa.item.DivineItem;
 import com.demigodsrpg.stoa.model.CharacterModel;
 import com.demigodsrpg.stoa.model.PlayerModel;
 import com.demigodsrpg.stoa.model.SkillModel;
@@ -27,7 +28,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.material.MaterialData;
 import org.bukkit.util.BlockIterator;
 
 import java.util.Collection;
@@ -52,9 +52,9 @@ public interface Ability {
 
     SkillModel.Type getType();
 
-    MaterialData getWeapon();
+    DivineItem getItem();
 
-    boolean hasWeapon();
+    boolean hasItem();
 
     boolean use(CharacterModel character);
 
