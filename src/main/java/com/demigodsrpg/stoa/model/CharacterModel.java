@@ -518,6 +518,15 @@ public class CharacterModel implements Participant {
         return this;
     }
 
+    public int getAscensions() {
+        double total = 0.0;
+
+        for (SkillModel skill : getSkills())
+            total += skill.getLevel();
+
+        return (int) Math.ceil(total / getSkills().size());
+    }
+
     @Override
     public CharacterModel getCharacter() {
         return this;
