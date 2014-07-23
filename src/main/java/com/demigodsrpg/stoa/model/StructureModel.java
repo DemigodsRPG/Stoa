@@ -1,10 +1,10 @@
 package com.demigodsrpg.stoa.model;
 
+import com.censoredsoftware.library.schematic.Schematic;
 import com.demigodsrpg.stoa.Stoa;
 import com.demigodsrpg.stoa.StoaPlugin;
 import com.demigodsrpg.stoa.StoaServer;
-import com.demigodsrpg.stoa.schematic.Schematic;
-import com.demigodsrpg.stoa.util.MetaUtil;
+import com.demigodsrpg.stoa.util.BukkitMetaUtil;
 import com.iciql.Db;
 import com.iciql.Iciql;
 import org.bukkit.Bukkit;
@@ -80,16 +80,16 @@ public class StructureModel {
     }
 
     public void setDefaultMetaData() {
-        center.setMetadata("stoa.structure.owner", MetaUtil.makeValue(ownerId));
-        center.setMetadata("stoa.structure.type", MetaUtil.makeValue(typeName));
-        center.setMetadata("stoa.structure.design", MetaUtil.makeValue(designName));
+        center.setMetadata("stoa.structure.owner", BukkitMetaUtil.makeValue(ownerId));
+        center.setMetadata("stoa.structure.type", BukkitMetaUtil.makeValue(typeName));
+        center.setMetadata("stoa.structure.design", BukkitMetaUtil.makeValue(designName));
         for (Location location : getLocations()) {
             Block block = location.getBlock();
-            block.setMetadata("stoa.structure", MetaUtil.makeValue(true));
-            block.setMetadata("stoa.structure.center.world", MetaUtil.makeValue(center.getWorld().getName()));
-            block.setMetadata("stoa.structure.center.x", MetaUtil.makeValue(center.getX()));
-            block.setMetadata("stoa.structure.center.y", MetaUtil.makeValue(center.getX()));
-            block.setMetadata("stoa.structure.center.z", MetaUtil.makeValue(center.getX()));
+            block.setMetadata("stoa.structure", BukkitMetaUtil.makeValue(true));
+            block.setMetadata("stoa.structure.center.world", BukkitMetaUtil.makeValue(center.getWorld().getName()));
+            block.setMetadata("stoa.structure.center.x", BukkitMetaUtil.makeValue(center.getX()));
+            block.setMetadata("stoa.structure.center.y", BukkitMetaUtil.makeValue(center.getX()));
+            block.setMetadata("stoa.structure.center.z", BukkitMetaUtil.makeValue(center.getX()));
         }
     }
 
@@ -154,6 +154,10 @@ public class StructureModel {
         return design;
     }
 
+    public void setDesign(Design design) {
+        this.design = design;
+    }
+
     public Collection<Location> getClickable() {
         return design.getClickable(center.getLocation());
     }
@@ -164,10 +168,6 @@ public class StructureModel {
 
     public Set<Location> getLocations() {
         return getSchematic().getLocations(center.getLocation());
-    }
-
-    public void setDesign(Design design) {
-        this.design = design;
     }
 
     public boolean sanctify(CharacterModel character) {
@@ -201,6 +201,10 @@ public class StructureModel {
         Db db = StoaServer.openDb();
         db.delete(this);
         db.close();
+    }
+
+    public enum Flag {
+        DELETE_WITH_OWNER, DESTRUCT_ON_BREAK, PROTECTED_BLOCKS, NO_GRIEFING, NO_PVP, PRAYER_LOCATION, OBELISK_LOCATION, TRIBUTE_LOCATION, RESTRICTED_AREA, NO_OVERLAP, STRUCTURE_WAND_GENERABLE
     }
 
     public interface Type {
@@ -243,9 +247,5 @@ public class StructureModel {
         Set<Location> getClickable(Location reference);
 
         Schematic getSchematic(@Nullable StructureModel data);
-    }
-
-    public enum Flag {
-        DELETE_WITH_OWNER, DESTRUCT_ON_BREAK, PROTECTED_BLOCKS, NO_GRIEFING, NO_PVP, PRAYER_LOCATION, OBELISK_LOCATION, TRIBUTE_LOCATION, RESTRICTED_AREA, NO_OVERLAP, STRUCTURE_WAND_GENERABLE
     }
 }

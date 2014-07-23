@@ -18,6 +18,86 @@ public class SkillModel {
     @Iciql.IQColumn
     public Integer level;
 
+    public String getId() {
+        return id;
+    }
+
+    public CharacterModel getCharacter() {
+        return CharacterUtil.fromId(characterId);
+    }
+
+    public void setCharacterId(String characterId) {
+        this.characterId = characterId;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+
+    public Integer getPoints() {
+        return points;
+    }
+
+    public void setPoints(Integer points) {
+        this.points = points;
+    }
+
+    public boolean hasMetCap() {
+        return getLevel() >= getCharacter().getIndividualSkillCap();
+    }
+
+    public int getLevel() {
+        return (level > 0) ? level : 1;
+    }
+
+    public void setLevel(Integer level) {
+        this.level = level;
+    }
+
+    public void addLevels(int levels) {
+        setLevel(getLevel() + levels);
+    }
+
+    public void addPoints(int points) {
+        // Add points 1 at a time
+        for (int i = 0; i < points; i++) {
+            // Adding 1 point at a time
+            this.points++;
+
+            if (getPoints() >= getRequiredPointsForLevel(getLevel() + 1)) {
+                // If they've met the max level cap then stop the addition
+                if (getLevel() + 1 >= getCharacter().getIndividualSkillCap()) return;
+
+                // Add a level
+                addLevels(1);
+
+                // Reset points
+                setPoints(0);
+            }
+        }
+    }
+
+    public int getRequiredPoints() {
+        return getRequiredPointsForLevel(getLevel() + 1) - getPoints();
+    }
+
+    public int getRequiredPointsForLevel(int level) {
+        switch (getType()) {
+            case OFFENSE:
+            case DEFENSE:
+            case SUPPORT:
+            case ULTIMATE:
+            case FAVOR_REGEN:
+                return (int) Math.ceil((level * Math.pow(level, 1.4)) + 5);
+        }
+
+        return -1;
+    }
+
     @Iciql.IQEnum
     public enum Type {
         /*
@@ -77,85 +157,5 @@ public class SkillModel {
         public boolean isLevelable() {
             return levelable;
         }
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public CharacterModel getCharacter() {
-        return CharacterUtil.fromId(characterId);
-    }
-
-    public void setCharacterId(String characterId) {
-        this.characterId = characterId;
-    }
-
-    public Type getType() {
-        return type;
-    }
-
-    public void setType(Type type) {
-        this.type = type;
-    }
-
-    public Integer getPoints() {
-        return points;
-    }
-
-    public void setPoints(Integer points) {
-        this.points = points;
-    }
-
-    public void setLevel(Integer level) {
-        this.level = level;
-    }
-
-    public boolean hasMetCap() {
-        return getLevel() >= getCharacter().getIndividualSkillCap();
-    }
-
-    public int getLevel() {
-        return (level > 0) ? level : 1;
-    }
-
-    public void addLevels(int levels) {
-        setLevel(getLevel() + levels);
-    }
-
-    public void addPoints(int points) {
-        // Add points 1 at a time
-        for (int i = 0; i < points; i++) {
-            // Adding 1 point at a time
-            this.points++;
-
-            if (getPoints() >= getRequiredPointsForLevel(getLevel() + 1)) {
-                // If they've met the max level cap then stop the addition
-                if (getLevel() + 1 >= getCharacter().getIndividualSkillCap()) return;
-
-                // Add a level
-                addLevels(1);
-
-                // Reset points
-                setPoints(0);
-            }
-        }
-    }
-
-    public int getRequiredPoints() {
-        return getRequiredPointsForLevel(getLevel() + 1) - getPoints();
-    }
-
-    public int getRequiredPointsForLevel(int level) {
-        switch (getType()) {
-            case OFFENSE:
-            case DEFENSE:
-            case SUPPORT:
-            case ULTIMATE:
-            case FAVOR_REGEN:
-                return (int) Math.ceil((level * Math.pow(level, 1.4)) + 5);
-        }
-
-        return -1;
     }
 }

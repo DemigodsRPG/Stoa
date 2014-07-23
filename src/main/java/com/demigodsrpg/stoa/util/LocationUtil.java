@@ -1,5 +1,6 @@
 package com.demigodsrpg.stoa.util;
 
+import com.censoredsoftware.library.util.RandomUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;

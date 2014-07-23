@@ -1,5 +1,6 @@
 package com.demigodsrpg.stoa.data.thread;
 
+import com.censoredsoftware.library.util.ThreadUtil;
 import com.demigodsrpg.stoa.Stoa;
 import com.demigodsrpg.stoa.StoaPlugin;
 import com.demigodsrpg.stoa.deity.Ability;

@@ -13,19 +13,6 @@ public class ItemRegistry {
     BiMap<String, DivineItem> PASSIVE_MAP = HashBiMap.create();
     BiMap<String, DivineItem> CONSUMABLE_MAP = HashBiMap.create();
 
-    private static class DivinePredicate implements Predicate<DivineItem> {
-        private ItemStack checking;
-
-        private DivinePredicate(ItemStack checking) {
-            this.checking = checking;
-        }
-
-        @Override
-        public boolean apply(DivineItem item) {
-            return item.getItem().equals(checking);
-        }
-    }
-
     public boolean addItem(DivineItem item) {
         String id = item.getId();
         switch (item.getType()) {
@@ -111,5 +98,18 @@ public class ItemRegistry {
 
     public boolean itemHasFlag(ItemStack itemStack, DivineItem.Flag flag) {
         return isDivineItemType(itemStack) && getDivineItemType(itemStack).getFlags().contains(flag);
+    }
+
+    private static class DivinePredicate implements Predicate<DivineItem> {
+        private ItemStack checking;
+
+        private DivinePredicate(ItemStack checking) {
+            this.checking = checking;
+        }
+
+        @Override
+        public boolean apply(DivineItem item) {
+            return item.getItem().equals(checking);
+        }
     }
 }

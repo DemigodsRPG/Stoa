@@ -44,6 +44,21 @@ public class StoaServer {
         registry = loadRegistry();
     }
 
+    public static boolean isRunningSpigot() {
+        try {
+            Bukkit.getServer().getWorlds().get(0).spigot();
+            return true;
+        } catch (Exception ignored) {
+            // ignored
+        }
+        return false;
+    }
+
+    public static Db openDb() {
+        Configuration config = StoaPlugin.getInst().getConfig();
+        return Db.open("jdbc:" + config.getString("db.type") + "://" + config.getString("db.host") + ":" + config.getString("db.port") + "/" + config.getString("db.name"), config.getString("db.user"), config.getString("db.pass"));
+    }
+
     public Mythos getMythos() {
         return mythos;
     }
@@ -251,21 +266,11 @@ public class StoaServer {
         else register.removePermission(permission);
     }
 
+    // -- PLAYER -- //
+
     void unloadPermissions() {
         loadPermissions(false);
     }
-
-    public static boolean isRunningSpigot() {
-        try {
-            Bukkit.getServer().getWorlds().get(0).spigot();
-            return true;
-        } catch (Exception ignored) {
-            // ignored
-        }
-        return false;
-    }
-
-    // -- PLAYER -- //
 
     public List<PlayerModel> getAllPlayers() {
         PlayerModel alias = new PlayerModel();
@@ -277,6 +282,8 @@ public class StoaServer {
         }
     }
 
+    // -- MORTAL -- //
+
     public Collection<PlayerModel> getOnlinePlayers() {
         return Collections2.transform(Bukkit.getOnlinePlayers(), new Function<Player, PlayerModel>() {
             @Override
@@ -285,8 +292,6 @@ public class StoaServer {
             }
         });
     }
-
-    // -- MORTAL -- //
 
     public Collection<PlayerModel> getMortals() {
         PlayerModel alias = new PlayerModel();
@@ -304,6 +309,8 @@ public class StoaServer {
         }
     }
 
+    // -- CHARACTER -- //
+
     public Collection<PlayerModel> getOnlineMortals() {
         PlayerModel alias = new PlayerModel();
         Db db = openDb();
@@ -319,8 +326,6 @@ public class StoaServer {
             db.close();
         }
     }
-
-    // -- CHARACTER -- //
 
     public CharacterModel getCharacter(String name) {
         return CharacterUtil.fromName(name);
@@ -358,11 +363,6 @@ public class StoaServer {
             if (online != null && online.getAlliance().equals(alliance)) onlineCharacters.add(online);
         }
         return onlineCharacters;
-    }
-
-    public static Db openDb() {
-        Configuration config = StoaPlugin.getInst().getConfig();
-        return Db.open("jdbc:" + config.getString("db.type") + "://" + config.getString("db.host") + ":" + config.getString("db.port") + "/" + config.getString("db.name"), config.getString("db.user"), config.getString("db.pass"));
     }
 
 }

@@ -7,6 +7,18 @@ import java.sql.Timestamp;
 
 @Iciql.IQTable(name = "dg_deaths")
 public class DeathModel {
+    // -- MODEL META -- //
+    @Iciql.IQColumn(primaryKey = true, autoIncrement = true)
+    public Long id;
+    // -- DATA -- //
+    @Iciql.IQColumn
+    public Timestamp deathTime;
+    // -- FOREIGN DATA -- //
+    @Iciql.IQColumn
+    public String victimId;
+    @Iciql.IQColumn
+    public String killerId;
+
     // -- DEFAULT CONSTRUCTOR -- //
     public DeathModel() {
     }
@@ -22,20 +34,6 @@ public class DeathModel {
         this(victim);
         killerId = killer.getCharacter().getId();
     }
-
-    // -- MODEL META -- //
-    @Iciql.IQColumn(primaryKey = true, autoIncrement = true)
-    public Long id;
-
-    // -- DATA -- //
-    @Iciql.IQColumn
-    public Timestamp deathTime;
-
-    // -- FOREIGN DATA -- //
-    @Iciql.IQColumn
-    public String victimId;
-    @Iciql.IQColumn
-    public String killerId;
 
     // TODO
 }

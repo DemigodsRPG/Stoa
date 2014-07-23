@@ -1,5 +1,7 @@
 package com.demigodsrpg.stoa.util;
 
+import com.censoredsoftware.library.util.RandomUtil;
+import com.censoredsoftware.library.util.VehicleUtil;
 import com.demigodsrpg.stoa.StoaPlugin;
 import com.demigodsrpg.stoa.StoaServer;
 import com.demigodsrpg.stoa.battle.Battle;

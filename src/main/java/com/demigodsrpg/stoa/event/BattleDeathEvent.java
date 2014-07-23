@@ -12,8 +12,8 @@ import java.util.UUID;
 
 public class BattleDeathEvent extends Event implements Cancellable {
     private static final HandlerList HANDLERS = new HandlerList();
-    private boolean cancel = false;
     UUID battle;
+    private boolean cancel = false;
     private String character, killer;
 
     public BattleDeathEvent(Battle battle, Participant character) {
@@ -25,6 +25,10 @@ public class BattleDeathEvent extends Event implements Cancellable {
         this.battle = battle.getId();
         this.character = character.getId();
         this.killer = killer.getId();
+    }
+
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
     }
 
     public boolean isCancelled() {
@@ -55,10 +59,6 @@ public class BattleDeathEvent extends Event implements Cancellable {
 
     @Override
     public HandlerList getHandlers() {
-        return HANDLERS;
-    }
-
-    public static HandlerList getHandlerList() {
         return HANDLERS;
     }
 }

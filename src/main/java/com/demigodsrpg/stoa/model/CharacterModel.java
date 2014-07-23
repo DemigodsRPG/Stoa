@@ -1,5 +1,6 @@
 package com.demigodsrpg.stoa.model;
 
+import com.censoredsoftware.library.util.CommonSymbol;
 import com.demigodsrpg.stoa.Stoa;
 import com.demigodsrpg.stoa.StoaPlugin;
 import com.demigodsrpg.stoa.StoaServer;
@@ -8,7 +9,6 @@ import com.demigodsrpg.stoa.deity.Ability;
 import com.demigodsrpg.stoa.deity.Alliance;
 import com.demigodsrpg.stoa.deity.Deity;
 import com.demigodsrpg.stoa.event.StoaChatEvent;
-import com.demigodsrpg.stoa.language.CommonSymbol;
 import com.demigodsrpg.stoa.util.*;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -26,6 +26,48 @@ import java.util.UUID;
 
 @Iciql.IQTable(name = "dg_characters")
 public class CharacterModel implements Participant {
+    // -- MODEL META -- //
+    @Iciql.IQColumn(name = "id", primaryKey = true)
+    public String uuid = UUID.randomUUID().toString();
+    // -- DATA -- //
+    @Iciql.IQColumn
+    public String name;
+    @Iciql.IQColumn
+    public String deity;
+    @Iciql.IQColumn
+    public Boolean alive;
+    @Iciql.IQColumn
+    public Boolean active;
+    @Iciql.IQColumn
+    public Boolean usable;
+    @Iciql.IQColumn
+    public Integer hunger;
+    @Iciql.IQColumn
+    public Integer level;
+    @Iciql.IQColumn(name = "kill_count")
+    public Integer killCount;
+    @Iciql.IQColumn
+    public Double health;
+    @Iciql.IQColumn
+    public Float experience;
+    @Iciql.IQEnum
+    @Iciql.IQColumn(name = "game_mode")
+    public GameMode gameMode;
+    // -- ADDITIONAL DATA -- //
+    @Iciql.IQColumn
+    public Integer favor;
+    @Iciql.IQColumn(name = "max_favor")
+    public Integer maxFavor;
+    @Iciql.IQColumn(name = "skill_points")
+    public Integer skillPoints;
+    // -- FOREIGN DATA -- //
+    @Iciql.IQColumn(nullable = false, name = "player_id")
+    public String playerId;
+    @Iciql.IQColumn(name = "last_location")
+    public String lastLocation;
+    @Iciql.IQColumn
+    public String bedSpawn;
+
     // -- DEFAULT CONSTRUCTOR -- //
     public CharacterModel() {
     }
@@ -56,51 +98,6 @@ public class CharacterModel implements Participant {
         playerId = player.mojangAccount;
     }
 
-    // -- MODEL META -- //
-    @Iciql.IQColumn(name = "id", primaryKey = true)
-    public String uuid = UUID.randomUUID().toString();
-
-    // -- DATA -- //
-    @Iciql.IQColumn
-    public String name;
-    @Iciql.IQColumn
-    public String deity;
-    @Iciql.IQColumn
-    public Boolean alive;
-    @Iciql.IQColumn
-    public Boolean active;
-    @Iciql.IQColumn
-    public Boolean usable;
-    @Iciql.IQColumn
-    public Integer hunger;
-    @Iciql.IQColumn
-    public Integer level;
-    @Iciql.IQColumn(name = "kill_count")
-    public Integer killCount;
-    @Iciql.IQColumn
-    public Double health;
-    @Iciql.IQColumn
-    public Float experience;
-    @Iciql.IQEnum
-    @Iciql.IQColumn(name = "game_mode")
-    public GameMode gameMode;
-
-    // -- ADDITIONAL DATA -- //
-    @Iciql.IQColumn
-    public Integer favor;
-    @Iciql.IQColumn(name = "max_favor")
-    public Integer maxFavor;
-    @Iciql.IQColumn(name = "skill_points")
-    public Integer skillPoints;
-
-    // -- FOREIGN DATA -- //
-    @Iciql.IQColumn(nullable = false, name = "player_id")
-    public String playerId;
-    @Iciql.IQColumn(name = "last_location")
-    public String lastLocation;
-    @Iciql.IQColumn
-    public String bedSpawn;
-
     public String getId() {
         return uuid;
     }
@@ -111,10 +108,6 @@ public class CharacterModel implements Participant {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public void setDeity(String deity) {
-        this.deity = deity;
     }
 
     public Boolean getAlive() {
@@ -246,16 +239,16 @@ public class CharacterModel implements Participant {
         return skillPoints;
     }
 
+    public void setSkillPoints(Integer skillPoints) {
+        this.skillPoints = skillPoints;
+    }
+
     public void addSkillPoints(Integer add) {
         skillPoints += add;
     }
 
     public void minusSkillPoints(Integer minus) {
         skillPoints -= minus;
-    }
-
-    public void setSkillPoints(Integer skillPoints) {
-        this.skillPoints = skillPoints;
     }
 
     public String getPlayerId() {
@@ -267,11 +260,11 @@ public class CharacterModel implements Participant {
     }
 
     public PlayerInventoryModel getInventory() {
-        return ItemUtil.playerInvFromOwnerId(uuid);
+        return ItemUtil2.playerInvFromOwnerId(uuid);
     }
 
     public EnderChestInventoryModel getEnderInventory() {
-        return ItemUtil.enderInvFromOwnerId(uuid);
+        return ItemUtil2.enderInvFromOwnerId(uuid);
     }
 
     public Location getLastLocation() {
@@ -290,6 +283,16 @@ public class CharacterModel implements Participant {
         this.bedSpawn = LocationUtil.stringFromLocation(bedSpawn);
     }
 
+    public List<PotionEffect> getPotionEffects() {
+        PotionEffectModel alias = new PotionEffectModel();
+        Db db = StoaServer.openDb();
+        try {
+            return db.from(alias).where(alias.id).is(uuid).selectFirst().getPotionEffects();
+        } finally {
+            db.close();
+        }
+    }
+
     public void setPotionEffects(Collection<PotionEffect> effects) {
         PotionEffectModel alias = new PotionEffectModel();
         Db db = StoaServer.openDb();
@@ -300,16 +303,6 @@ public class CharacterModel implements Participant {
         model = new PotionEffectModel(uuid, effects);
         db.insert(model);
         db.close();
-    }
-
-    public List<PotionEffect> getPotionEffects() {
-        PotionEffectModel alias = new PotionEffectModel();
-        Db db = StoaServer.openDb();
-        try {
-            return db.from(alias).where(alias.id).is(uuid).selectFirst().getPotionEffects();
-        } finally {
-            db.close();
-        }
     }
 
     public Collection<Deity> getMinorDeities() {
@@ -323,6 +316,10 @@ public class CharacterModel implements Participant {
 
     public Deity getDeity() {
         return Stoa.getMythos().getDeity(deity);
+    }
+
+    public void setDeity(String deity) {
+        this.deity = deity;
     }
 
     public Alliance getAlliance() {

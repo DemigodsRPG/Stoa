@@ -30,11 +30,11 @@ public class StructureUtil {
             Block center = getCenterBlock(block);
 
             // Get the owner
-            String ownerId = MetaUtil.getMetadata(center, "stoa.structure.owner").asString();
+            String ownerId = BukkitMetaUtil.getMetadata(center, "stoa.structure.owner").asString();
 
             // Get the type and design names
-            String typeName = MetaUtil.getMetadata(center, "stoa.structure.type").asString();
-            String designName = MetaUtil.getMetadata(center, "stoa.structure.design").asString();
+            String typeName = BukkitMetaUtil.getMetadata(center, "stoa.structure.type").asString();
+            String designName = BukkitMetaUtil.getMetadata(center, "stoa.structure.design").asString();
 
             // Does the type exist?
             if (typeExists(typeName)) {
@@ -54,10 +54,10 @@ public class StructureUtil {
     public static Block getCenterBlock(Block block) {
         if (block.hasMetadata("stoa.structure")) {
             // Get the data
-            String world = MetaUtil.getMetadata(block, "stoa.structure.center.world").asString();
-            int x = MetaUtil.getMetadata(block, "stoa.structure.center.x").asInt();
-            int y = MetaUtil.getMetadata(block, "stoa.structure.center.y").asInt();
-            int z = MetaUtil.getMetadata(block, "stoa.structure.center.z").asInt();
+            String world = BukkitMetaUtil.getMetadata(block, "stoa.structure.center.world").asString();
+            int x = BukkitMetaUtil.getMetadata(block, "stoa.structure.center.x").asInt();
+            int y = BukkitMetaUtil.getMetadata(block, "stoa.structure.center.y").asInt();
+            int z = BukkitMetaUtil.getMetadata(block, "stoa.structure.center.z").asInt();
 
             // Create the location and return the block
             if (Bukkit.getWorld(world) != null) {

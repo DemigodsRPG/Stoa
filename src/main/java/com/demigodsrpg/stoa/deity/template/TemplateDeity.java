@@ -1,10 +1,10 @@
 package com.demigodsrpg.stoa.deity.template;
 
+import com.censoredsoftware.library.util.CommonSymbol;
+import com.censoredsoftware.library.util.StringUtil2;
 import com.demigodsrpg.stoa.deity.Ability;
 import com.demigodsrpg.stoa.deity.Alliance;
 import com.demigodsrpg.stoa.deity.Deity;
-import com.demigodsrpg.stoa.language.CommonSymbol;
-import com.demigodsrpg.stoa.util.StringUtil2;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -22,6 +22,7 @@ import java.util.Set;
 
 public class TemplateDeity implements Deity {
     public static String name = "Template", shortDescription = ChatColor.GRAY + "The deity of testing.";
+    public static List<Ability> abilities = Lists.newArrayList((Ability) new TemplateAbility(name));
     public static Alliance alliance = new Alliance() {
         @Override
         public String getName() {
@@ -55,6 +56,7 @@ public class TemplateDeity implements Deity {
     public static ChatColor color = ChatColor.GRAY;
     public static Map<Material, Integer> claimItems = Maps.newHashMap(ImmutableMap.of(Material.BEDROCK, 1));
     public static Map<Material, Integer> forsakeItems = Maps.newHashMap(ImmutableMap.of(Material.BEDROCK, 1));
+    public static Set<Deity.Flag> flags = Sets.newHashSet(Deity.Flag.NON_PLAYABLE);
     public static List<String> lore = new ArrayList<String>(9 + claimItems.size()) {
         {
             add(" ");
@@ -70,8 +72,6 @@ public class TemplateDeity implements Deity {
             add(" ");
         }
     };
-    public static Set<Deity.Flag> flags = Sets.newHashSet(Deity.Flag.NON_PLAYABLE);
-    public static List<Ability> abilities = Lists.newArrayList((Ability) new TemplateAbility(name));
 
     @Override
     public String getName() {

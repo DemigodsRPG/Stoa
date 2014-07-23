@@ -28,6 +28,10 @@ public abstract class StoaPlugin extends AbstractJavaPlugin {
         return INST.getConfig();
     }
 
+    public static boolean getReady() {
+        return ready;
+    }
+
     /**
      * The Bukkit enable method.
      */
@@ -56,10 +60,6 @@ public abstract class StoaPlugin extends AbstractJavaPlugin {
         Stoa.getServer().uninit();
 
         if (ready) message(" disabled");
-    }
-
-    public static boolean getReady() {
-        return ready;
     }
 
     protected abstract void message(String status);

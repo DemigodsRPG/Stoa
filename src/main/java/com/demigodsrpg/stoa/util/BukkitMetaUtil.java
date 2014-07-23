@@ -7,8 +7,8 @@ import org.bukkit.metadata.LazyMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.metadata.Metadatable;
 
-public class MetaUtil {
-    private MetaUtil() {
+public class BukkitMetaUtil {
+    private BukkitMetaUtil() {
     }
 
     public static MetadataValue getMetadata(Metadatable obj, String key) {

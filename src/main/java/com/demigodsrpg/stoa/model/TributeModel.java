@@ -26,28 +26,28 @@ public class TributeModel {
         this.amount = amount;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public void setMaterial(Material material) {
-        this.material = material;
-    }
-
-    public void setAmount(int amount) {
-        this.amount = amount;
-    }
-
     public String getCategory() {
         return this.category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public Material getMaterial() {
         return material;
     }
 
+    public void setMaterial(Material material) {
+        this.material = material;
+    }
+
     public int getAmount() {
         return amount;
+    }
+
+    public void setAmount(int amount) {
+        this.amount = amount;
     }
 
     public void remove() {

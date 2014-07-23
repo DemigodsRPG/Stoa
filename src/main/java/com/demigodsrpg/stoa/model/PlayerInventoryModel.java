@@ -1,7 +1,7 @@
 package com.demigodsrpg.stoa.model;
 
 
-import com.demigodsrpg.stoa.util.ItemUtil;
+import com.censoredsoftware.library.util.ItemUtil;
 import com.iciql.Iciql;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;

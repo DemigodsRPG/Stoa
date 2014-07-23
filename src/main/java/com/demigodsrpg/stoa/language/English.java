@@ -1,5 +1,6 @@
 package com.demigodsrpg.stoa.language;
 
+import com.censoredsoftware.library.util.CommonSymbol;
 import com.demigodsrpg.stoa.StoaPlugin;
 import com.google.common.collect.Lists;
 import org.bukkit.ChatColor;

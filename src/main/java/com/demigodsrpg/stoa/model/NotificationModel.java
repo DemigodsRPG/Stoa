@@ -9,6 +9,26 @@ import java.util.concurrent.TimeUnit;
 
 @Iciql.IQTable(name = "dg_notifications")
 public class NotificationModel {
+    // -- MODEL META -- //
+    @Iciql.IQColumn(primaryKey = true)
+    public String id = UUID.randomUUID().toString();
+    // -- DATA -- //
+    @Iciql.IQColumn
+    public SenderType type = SenderType.SERVER;
+    @Iciql.IQColumn
+    public Alert alert = Alert.NEUTRAL;
+    @Iciql.IQColumn
+    public String name;
+    @Iciql.IQColumn
+    public String message;
+    @Iciql.IQColumn
+    public Timestamp expiration;
+    // -- FOREIGN DATA -- //
+    @Iciql.IQColumn
+    public String senderId;
+    @Iciql.IQColumn
+    public String receiverId;
+
     // -- DEFAULT CONSTRUCTOR -- //
     public NotificationModel() {
     }
@@ -31,10 +51,6 @@ public class NotificationModel {
         }
     }
 
-    // -- MODEL META -- //
-    @Iciql.IQColumn(primaryKey = true)
-    public String id = UUID.randomUUID().toString();
-
     // -- ENUMS -- //
     @Iciql.IQEnum
     public enum SenderType {
@@ -45,22 +61,4 @@ public class NotificationModel {
     public enum Alert {
         GOOD, NEUTRAL, BAD
     }
-
-    // -- DATA -- //
-    @Iciql.IQColumn
-    public SenderType type = SenderType.SERVER;
-    @Iciql.IQColumn
-    public Alert alert = Alert.NEUTRAL;
-    @Iciql.IQColumn
-    public String name;
-    @Iciql.IQColumn
-    public String message;
-    @Iciql.IQColumn
-    public Timestamp expiration;
-
-    // -- FOREIGN DATA -- //
-    @Iciql.IQColumn
-    public String senderId;
-    @Iciql.IQColumn
-    public String receiverId;
 }

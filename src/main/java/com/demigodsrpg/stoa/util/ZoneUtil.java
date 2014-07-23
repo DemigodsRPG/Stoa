@@ -1,5 +1,6 @@
 package com.demigodsrpg.stoa.util;
 
+import com.censoredsoftware.library.util.WorldGuardUtil;
 import com.demigodsrpg.stoa.StoaPlugin;
 import com.demigodsrpg.stoa.listener.ZoneListener;
 import com.demigodsrpg.stoa.model.StructureModel;

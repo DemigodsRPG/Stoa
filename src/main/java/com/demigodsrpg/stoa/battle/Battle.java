@@ -1,8 +1,8 @@
 package com.demigodsrpg.stoa.battle;
 
+import com.censoredsoftware.library.util.CommonSymbol;
 import com.demigodsrpg.stoa.StoaPlugin;
 import com.demigodsrpg.stoa.deity.Alliance;
-import com.demigodsrpg.stoa.language.CommonSymbol;
 import com.demigodsrpg.stoa.model.CharacterModel;
 import com.demigodsrpg.stoa.util.BattleUtil;
 import com.demigodsrpg.stoa.util.CharacterUtil;
@@ -137,12 +137,12 @@ public class Battle {
         this.participants = participants;
     }
 
-    public void setKillCounter(Integer killCounter) {
-        this.killCounter = killCounter;
-    }
-
     public Map<Participant, Integer> getKills() {
         return kills;
+    }
+
+    public void setKills(Map<Participant, Integer> kills) {
+        this.kills = kills;
     }
 
     public void addDeath(Participant participant) {
@@ -153,10 +153,6 @@ public class Battle {
     public void addKill(Participant participant) {
         int kill = kills.get(participant);
         kills.put(participant, kill + 1);
-    }
-
-    public void setKills(Map<Participant, Integer> kills) {
-        this.kills = kills;
     }
 
     public Map<Participant, Integer> getDeaths() {
@@ -233,6 +229,10 @@ public class Battle {
 
     public int getKillCounter() {
         return this.killCounter;
+    }
+
+    public void setKillCounter(Integer killCounter) {
+        this.killCounter = killCounter;
     }
 
     public void end() // TODO Make this specify that it was a pet that won/lost a duel

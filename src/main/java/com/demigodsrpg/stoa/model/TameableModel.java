@@ -49,11 +49,6 @@ public class TameableModel implements Participant {
         this.entityUUID = tameable.getUniqueId().toString();
     }
 
-    public void setOwnerId(String ownerId) {
-        this.animalTamer = ownerId;
-        this.ownerId = ownerId;
-    }
-
     public boolean canPvp() {
         return canPvp;
     }
@@ -88,6 +83,11 @@ public class TameableModel implements Participant {
 
     public String getOwnerId() {
         return ownerId;
+    }
+
+    public void setOwnerId(String ownerId) {
+        this.animalTamer = ownerId;
+        this.ownerId = ownerId;
     }
 
     public String getId() {
@@ -127,10 +127,6 @@ public class TameableModel implements Participant {
         });
     }
 
-    public void setOwner(CharacterModel owner) {
-        setOwnerId(owner.playerId);
-    }
-
     public CharacterModel getOwner() {
         CharacterModel owner = CharacterUtil.fromId(ownerId);
         if (owner == null) {
@@ -139,6 +135,10 @@ public class TameableModel implements Participant {
             return null;
         } else if (!owner.getUsable()) return null;
         return owner;
+    }
+
+    public void setOwner(CharacterModel owner) {
+        setOwnerId(owner.playerId);
     }
 
     public Deity getDeity() {

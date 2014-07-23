@@ -21,6 +21,34 @@ import java.util.concurrent.TimeUnit;
 
 @Iciql.IQTable(name = "dg_players")
 public class PlayerModel implements Participant {
+    // -- MODEL META -- //
+    @Iciql.IQColumn(name = "id", primaryKey = true)
+    public String mojangAccount;
+    // -- DATA -- //
+    @Iciql.IQColumn
+    public String playerName;
+    @Iciql.IQColumn
+    public String mortalName;
+    @Iciql.IQColumn
+    public String mortalListName;
+    @Iciql.IQColumn
+    public Boolean canPvp;
+    @Iciql.IQColumn
+    public Integer characterSlots;
+    @Iciql.IQColumn
+    public Timestamp lastLoginTime;
+    @Iciql.IQColumn
+    public Timestamp lastLogoutTime;
+    // -- FOREIGN DATA -- //
+    @Iciql.IQColumn
+    public String currentCharacterId;
+    @Iciql.IQColumn
+    public String mortalInventoryId;
+    @Iciql.IQColumn
+    public String mortalEnderChestId;
+    // -- TRANSIENT -- //
+    public transient ChatRecorder chatRecorder;
+
     // -- DEFAULT CONSTRUCTOR -- //
     public PlayerModel() {
     }
@@ -38,37 +66,6 @@ public class PlayerModel implements Participant {
         characterSlots = StoaPlugin.config().getInt("character.default_character_slots");
         lastLoginTime = new Timestamp(System.currentTimeMillis());
     }
-
-    // -- MODEL META -- //
-    @Iciql.IQColumn(name = "id", primaryKey = true)
-    public String mojangAccount;
-
-    // -- DATA -- //
-    @Iciql.IQColumn
-    public String playerName;
-    @Iciql.IQColumn
-    public String mortalName;
-    @Iciql.IQColumn
-    public String mortalListName;
-    @Iciql.IQColumn
-    public Boolean canPvp;
-    @Iciql.IQColumn
-    public Integer characterSlots;
-    @Iciql.IQColumn
-    public Timestamp lastLoginTime;
-    @Iciql.IQColumn
-    public Timestamp lastLogoutTime;
-
-    // -- FOREIGN DATA -- //
-    @Iciql.IQColumn
-    public String currentCharacterId;
-    @Iciql.IQColumn
-    public String mortalInventoryId;
-    @Iciql.IQColumn
-    public String mortalEnderChestId;
-
-    // -- TRANSIENT -- //
-    public transient ChatRecorder chatRecorder;
 
     public String getMojangAccount() {
         return mojangAccount;
@@ -218,14 +215,14 @@ public class PlayerModel implements Participant {
     public void saveMortalInventory(Player player) {
         // Player inventory
         Db db = StoaServer.openDb();
-        PlayerInventoryModel mortalInventory = ItemUtil.playerInvFromOwnerId("mortal:" + mojangAccount);
+        PlayerInventoryModel mortalInventory = ItemUtil2.playerInvFromOwnerId("mortal:" + mojangAccount);
         PlayerInventory inventory = player.getInventory();
         mortalInventory.setArmor(inventory.getArmorContents());
         mortalInventory.setContents(inventory.getContents());
         db.update(mortalInventory);
 
         // Enderchest
-        EnderChestInventoryModel enderInventory = ItemUtil.enderInvFromOwnerId("mortal:" + mojangAccount);
+        EnderChestInventoryModel enderInventory = ItemUtil2.enderInvFromOwnerId("mortal:" + mojangAccount);
         Inventory enderChest = player.getEnderChest();
         enderInventory.setContents(enderChest.getContents());
         db.update(enderInventory);
@@ -310,11 +307,11 @@ public class PlayerModel implements Participant {
     }
 
     public PlayerInventoryModel getMortalInventory() {
-        return ItemUtil.playerInvFromOwnerId("mortal;" + mojangAccount);
+        return ItemUtil2.playerInvFromOwnerId("mortal;" + mojangAccount);
     }
 
     public EnderChestInventoryModel getMortalEnderInventory() {
-        return ItemUtil.enderInvFromOwnerId("mortal;" + mojangAccount);
+        return ItemUtil2.enderInvFromOwnerId("mortal;" + mojangAccount);
     }
 
     public void applyMortalInventory() {

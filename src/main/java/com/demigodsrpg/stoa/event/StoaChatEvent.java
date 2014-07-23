@@ -45,6 +45,10 @@ public class StoaChatEvent extends Event implements Cancellable {
         }));
     }
 
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
+    }
+
     public boolean isCancelled() {
         return cancel;
     }
@@ -67,10 +71,6 @@ public class StoaChatEvent extends Event implements Cancellable {
 
     @Override
     public HandlerList getHandlers() {
-        return HANDLERS;
-    }
-
-    public static HandlerList getHandlerList() {
         return HANDLERS;
     }
 }

@@ -18,6 +18,20 @@ public class StoaRegion {
         this.world = world;
     }
 
+    public static StoaRegion at(Location location) {
+        return new StoaRegion(getCoordinate(location.getBlockX()), getCoordinate(location.getBlockZ()), location.getWorld().getName());
+    }
+
+    public static StoaRegion at(int X, int Z, String world) {
+        return new StoaRegion(getCoordinate(X), getCoordinate(Z), world);
+    }
+
+    public static int getCoordinate(int number) {
+        int temp = number % REGION_LENGTH;
+        if (temp >= HALF_REGION_LENGTH) return number + REGION_LENGTH - temp;
+        return number - temp;
+    }
+
     public int getX() {
         return x;
     }
@@ -77,19 +91,5 @@ public class StoaRegion {
     @Override
     public boolean equals(Object object) {
         return Objects.equal(this, object);
-    }
-
-    public static StoaRegion at(Location location) {
-        return new StoaRegion(getCoordinate(location.getBlockX()), getCoordinate(location.getBlockZ()), location.getWorld().getName());
-    }
-
-    public static StoaRegion at(int X, int Z, String world) {
-        return new StoaRegion(getCoordinate(X), getCoordinate(Z), world);
-    }
-
-    public static int getCoordinate(int number) {
-        int temp = number % REGION_LENGTH;
-        if (temp >= HALF_REGION_LENGTH) return number + REGION_LENGTH - temp;
-        return number - temp;
     }
 }
