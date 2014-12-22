@@ -30,7 +30,6 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicesManager;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.mcstats.MetricsLite;
 
 import java.util.*;
 
@@ -78,13 +77,6 @@ public class StoaServer {
             Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-        }
-
-        // Initialize metrics
-        try {
-            (new MetricsLite(StoaPlugin.getInst())).start();
-        } catch (Exception ignored) {
-            // ignored
         }
 
         try {

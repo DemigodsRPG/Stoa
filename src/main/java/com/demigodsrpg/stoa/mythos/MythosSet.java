@@ -1,6 +1,5 @@
 package com.demigodsrpg.stoa.mythos;
 
-import com.censoredsoftware.library.command.CommandManager;
 import com.censoredsoftware.library.util.SyncAsyncRunnable;
 import com.demigodsrpg.stoa.StoaPlugin;
 import com.demigodsrpg.stoa.deity.Alliance;
@@ -10,6 +9,7 @@ import com.demigodsrpg.stoa.model.StructureModel;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.*;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.event.Listener;
 import org.bukkit.permissions.Permission;
 
@@ -26,7 +26,7 @@ public class MythosSet implements Mythos {
     private final ImmutableMap<String, StructureModel.Type> STRUCTURES;
     private final ImmutableSet<Listener> LISTENERS;
     private final ImmutableSet<Permission> PERMISSIONS;
-    private final ImmutableSet<CommandManager> COMMANDS;
+    private final ImmutableSet<CommandExecutor> COMMANDS;
     private final ImmutableSet<SyncAsyncRunnable> TRIGGERS;
 
     public MythosSet(Mythos primaryMythos, Set<Mythos> mythosSet) {
@@ -49,7 +49,7 @@ public class MythosSet implements Mythos {
         Set<StructureModel.Type> structureType = Sets.newHashSet();
         Set<Listener> listener = Sets.newHashSet();
         Set<Permission> permission = Sets.newHashSet();
-        Set<CommandManager> command = Sets.newHashSet();
+        Set<CommandExecutor> command = Sets.newHashSet();
         Set<SyncAsyncRunnable> trigger = Sets.newHashSet();
 
         for (Mythos mythos : SET) {
@@ -181,7 +181,7 @@ public class MythosSet implements Mythos {
     }
 
     @Override
-    public ImmutableCollection<CommandManager> getCommands() {
+    public ImmutableCollection<CommandExecutor> getCommands() {
         return COMMANDS;
     }
 

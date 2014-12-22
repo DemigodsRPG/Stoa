@@ -260,11 +260,11 @@ public class CharacterModel implements Participant {
     }
 
     public PlayerInventoryModel getInventory() {
-        return ItemUtil2.playerInvFromOwnerId(uuid);
+        return ItemUtil.playerInvFromOwnerId(uuid);
     }
 
     public EnderChestInventoryModel getEnderInventory() {
-        return ItemUtil2.enderInvFromOwnerId(uuid);
+        return ItemUtil.enderInvFromOwnerId(uuid);
     }
 
     public Location getLastLocation() {

@@ -1,6 +1,5 @@
 package com.demigodsrpg.stoa.util;
 
-import com.censoredsoftware.library.util.WorldGuardUtil;
 import com.demigodsrpg.stoa.StoaPlugin;
 import com.demigodsrpg.stoa.listener.ZoneListener;
 import com.demigodsrpg.stoa.model.StructureModel;
@@ -12,6 +11,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import java.util.Set;
@@ -34,10 +34,10 @@ public class ZoneUtil {
         Bukkit.getPluginManager().registerEvents(new ZoneListener(), StoaPlugin.getInst());
 
         // Init WorldGuard stuff
-        WorldGuardUtil.setWhenToOverridePVP(StoaPlugin.getInst(), new Predicate<EntityDamageByEntityEvent>() {
+        WorldGuardUtil.setWhenToOverridePVP(StoaPlugin.getInst(), new Predicate<Event>() {
             @Override
-            public boolean apply(EntityDamageByEntityEvent event) {
-                return !inNoStoaZone(event.getEntity().getLocation());
+            public boolean apply(Event event) {
+                return event instanceof EntityDamageByEntityEvent && !inNoStoaZone(((EntityDamageByEntityEvent) event).getEntity().getLocation());
             }
         });
 

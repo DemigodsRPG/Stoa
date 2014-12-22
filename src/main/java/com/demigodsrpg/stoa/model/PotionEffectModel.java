@@ -1,6 +1,6 @@
 package com.demigodsrpg.stoa.model;
 
-import com.censoredsoftware.library.util.PotionEffectUtil;
+import com.demigodsrpg.stoa.util.PotionEffectUtil;
 import com.iciql.Iciql;
 import org.bukkit.potion.PotionEffect;
 

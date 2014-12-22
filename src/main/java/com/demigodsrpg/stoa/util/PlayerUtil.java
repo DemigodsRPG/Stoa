@@ -3,8 +3,8 @@ package com.demigodsrpg.stoa.util;
 import com.demigodsrpg.stoa.StoaServer;
 import com.demigodsrpg.stoa.model.CharacterModel;
 import com.demigodsrpg.stoa.model.PlayerModel;
+import com.google.common.collect.Iterables;
 import com.iciql.Db;
-import net.minecraft.util.com.google.common.collect.Iterables;
 import org.bukkit.entity.Player;
 
 public class PlayerUtil {

@@ -1,5 +1,6 @@
 package com.demigodsrpg.stoa.util;
 
+import com.censoredsoftware.library.schematic.Point;
 import com.demigodsrpg.stoa.Stoa;
 import com.demigodsrpg.stoa.StoaServer;
 import com.demigodsrpg.stoa.location.StoaRegion;
@@ -209,7 +210,8 @@ public class StructureUtil {
         StructureModel alias = new StructureModel();
         Db db = StoaServer.openDb();
         for (StructureModel save : db.from(alias).select()) {
-            save.getSchematic().generate(save.getCenter().getLocation());
+            Block center = save.getCenter();
+            save.getSchematic().generate(new Point(center.getX(), center.getY(), center.getZ(), new StructureWorld(center.getWorld())));
         }
         db.close();
     }

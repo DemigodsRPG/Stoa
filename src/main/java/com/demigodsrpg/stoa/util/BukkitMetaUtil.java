@@ -2,7 +2,7 @@ package com.demigodsrpg.stoa.util;
 
 import com.demigodsrpg.stoa.StoaPlugin;
 import com.demigodsrpg.stoa.data.MetaCallable;
-import net.minecraft.util.com.google.common.collect.Iterables;
+import com.google.common.collect.Iterables;
 import org.bukkit.metadata.LazyMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.metadata.Metadatable;

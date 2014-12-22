@@ -1,6 +1,6 @@
 package com.demigodsrpg.stoa.mythos;
 
-import com.censoredsoftware.library.command.AbstractJavaPlugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
-public abstract class MythosPlugin extends AbstractJavaPlugin implements Mythos {
+public abstract class MythosPlugin extends JavaPlugin implements Mythos {
 }

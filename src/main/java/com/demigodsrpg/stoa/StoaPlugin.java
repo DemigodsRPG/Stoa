@@ -1,6 +1,5 @@
 package com.demigodsrpg.stoa;
 
-import com.censoredsoftware.library.command.AbstractJavaPlugin;
 import com.demigodsrpg.stoa.mythos.Mythos;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -8,6 +7,7 @@ import com.google.common.collect.Sets;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.util.Collection;
@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Bukkit plugin object for implementations of Stoa.
  */
-public abstract class StoaPlugin extends AbstractJavaPlugin {
+public abstract class StoaPlugin extends JavaPlugin {
     static StoaPlugin INST;
     static boolean ready = false;
 

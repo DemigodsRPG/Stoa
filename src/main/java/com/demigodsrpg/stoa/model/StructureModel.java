@@ -1,10 +1,14 @@
 package com.demigodsrpg.stoa.model;
 
+import com.censoredsoftware.library.schematic.Point;
 import com.censoredsoftware.library.schematic.Schematic;
 import com.demigodsrpg.stoa.Stoa;
 import com.demigodsrpg.stoa.StoaPlugin;
 import com.demigodsrpg.stoa.StoaServer;
 import com.demigodsrpg.stoa.util.BukkitMetaUtil;
+import com.demigodsrpg.stoa.util.StructureWorld;
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
 import com.iciql.Db;
 import com.iciql.Iciql;
 import org.bukkit.Bukkit;
@@ -14,7 +18,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Set;
 
@@ -166,8 +169,17 @@ public class StructureModel {
         return design.getSchematic(this);
     }
 
-    public Set<Location> getLocations() {
-        return getSchematic().getLocations(center.getLocation());
+    public Set<Point> getPoints() {
+        return getSchematic().getLocations(new Point(center.getX(), center.getY(), center.getZ(), new StructureWorld(center.getWorld())));
+    }
+
+    public Collection<Location> getLocations() {
+        return Collections2.transform(getPoints(), new Function<Point, Location>() {
+            @Override
+            public Location apply(Point point) {
+                return new Location(((StructureWorld) point.getWorld()).getBukkitWorld(), point.getX(), point.getY(), point.getZ());
+            }
+        });
     }
 
     public boolean sanctify(CharacterModel character) {
@@ -236,9 +248,9 @@ public class StructureModel {
 
         int getRequiredGenerationCoords();
 
-        boolean isAllowed(@Nullable StructureModel data, Player sender);
+        boolean isAllowed(StructureModel data, Player sender);
 
-        StructureModel createNew(boolean generate, @Nullable String design, Location... reference);
+        StructureModel createNew(boolean generate, String design, Location... reference);
     }
 
     public interface Design {
@@ -246,6 +258,6 @@ public class StructureModel {
 
         Set<Location> getClickable(Location reference);
 
-        Schematic getSchematic(@Nullable StructureModel data);
+        Schematic getSchematic(StructureModel data);
     }
 }

@@ -215,14 +215,14 @@ public class PlayerModel implements Participant {
     public void saveMortalInventory(Player player) {
         // Player inventory
         Db db = StoaServer.openDb();
-        PlayerInventoryModel mortalInventory = ItemUtil2.playerInvFromOwnerId("mortal:" + mojangAccount);
+        PlayerInventoryModel mortalInventory = ItemUtil.playerInvFromOwnerId("mortal:" + mojangAccount);
         PlayerInventory inventory = player.getInventory();
         mortalInventory.setArmor(inventory.getArmorContents());
         mortalInventory.setContents(inventory.getContents());
         db.update(mortalInventory);
 
         // Enderchest
-        EnderChestInventoryModel enderInventory = ItemUtil2.enderInvFromOwnerId("mortal:" + mojangAccount);
+        EnderChestInventoryModel enderInventory = ItemUtil.enderInvFromOwnerId("mortal:" + mojangAccount);
         Inventory enderChest = player.getEnderChest();
         enderInventory.setContents(enderChest.getContents());
         db.update(enderInventory);
@@ -307,11 +307,11 @@ public class PlayerModel implements Participant {
     }
 
     public PlayerInventoryModel getMortalInventory() {
-        return ItemUtil2.playerInvFromOwnerId("mortal;" + mojangAccount);
+        return ItemUtil.playerInvFromOwnerId("mortal;" + mojangAccount);
     }
 
     public EnderChestInventoryModel getMortalEnderInventory() {
-        return ItemUtil2.enderInvFromOwnerId("mortal;" + mojangAccount);
+        return ItemUtil.enderInvFromOwnerId("mortal;" + mojangAccount);
     }
 
     public void applyMortalInventory() {
